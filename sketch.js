@@ -9,7 +9,8 @@ let notes = [];
 let jCircle = [];
 let kp = [false, false, false, false];
 let tColor = (255, 0, 255);
-let jColor = (255, 255, 255)
+let keys = [false, false, false, false];
+let jColor = (255, 255, 255);
 
 function draw() {
 	resizeCanvas(windowWidth, windowHeight);
@@ -18,6 +19,7 @@ function draw() {
 	let vs = [];
 	const tSize = windowWidth * 0.2;
 	background(25, 25, 25);
+	fill(255, 255, 255);
 	rectMode(CENTER);
 	translate(width / 2, height / 2);
 	let track = rect(0, 0, tSize, height);
@@ -25,9 +27,11 @@ function draw() {
 	for (let i = 0; i < 4; i++) {
 		foo.push(rect(x, 0, tSize / 4, height));
 		bar.push(x);
-		if(kp[i]){
-			fill(jColor)
-		}
+		if (keys[0] && i === 0) fill(255, 0, 0);
+		if (keys[1] && i === 1) fill(255, 0, 0);
+		if (keys[2] && i === 2) fill(255, 0, 0);
+		if (keys[3] && i === 3) fill(255, 0, 0);
+
 		vs.push(
 			ellipse(
 				x,
@@ -37,9 +41,9 @@ function draw() {
 			)
 		);
 		x += tSize / 4;
-		fill(jColor)
+		fill(255, 255, 255);
 	}
-
+	fill(255, 255, 255);
 	for (let note of notes) {
 		push();
 		fill(0, 255, 255);
@@ -60,7 +64,22 @@ function draw() {
 	jCircle = vs;
 }
 
+function keyPressed() {
+	if (key == 'd') {
+		keys[0] = true;
+		if()
+	}
+	if (key == 'f') keys[1] = true;
+	if (key == 'j') keys[2] = true;
+	if (key == 'k') keys[3] = true;
+}
 
+function keyReleased() {
+	if (key === 'd') keys[0] = false;
+	if (key === 'f') keys[1] = false;
+	if (key === 'j') keys[2] = false;
+	if (key === 'k') keys[3] = false;
+}
 
 function dropCircle() {
 	note = {
