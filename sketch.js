@@ -24,7 +24,14 @@ function draw() {
 		fill(255, 255, 255);
 		foo.push(rect(x, 0, tSize / 4, height));
 		bar.push(x);
-		vs.push(ellipse(x, 300, windowWidth * 0.045, windowWidth * 0.045))
+		vs.push(
+			ellipse(
+				x,
+				300,
+				windowWidth * 0.045,
+				windowWidth * 0.045
+			)
+		);
 		x += tSize / 4;
 	}
 	lanes = foo;
@@ -32,8 +39,8 @@ function draw() {
 	jCircle = vs;
 	for (let note of notes) {
 		push();
-		fill(0,255,255);
-		ellipse(note.x, note.y, note.w,note.h)
+		fill(0, 255, 255);
+		ellipse(note.x, note.y, note.w, note.h);
 		note.y += 25;
 		pop();
 	}
@@ -46,7 +53,7 @@ function draw() {
 function dropCircle() {
 	note = {
 		x: lanePos[Math.floor(random(0, 4))],
-		y: -height/2,
+		y: -height / 2,
 		w: windowWidth * 0.045,
 		h: windowWidth * 0.045,
 		color: (0, 225, 255)
