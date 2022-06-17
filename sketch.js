@@ -65,13 +65,10 @@ function draw() {
 }
 
 function keyPressed() {
-	if (key == 'd') {
-		keys[0] = true;
-		if()
-	}
-	if (key == 'f') keys[1] = true;
-	if (key == 'j') keys[2] = true;
-	if (key == 'k') keys[3] = true;
+	if (key == 'd')  keys[0] = true;
+	if (key === 'f') keys[1] = true;
+	if (key === 'j') keys[2] = true;
+	if (key === 'k') keys[3] = true;
 }
 
 function keyReleased() {
