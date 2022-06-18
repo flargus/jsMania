@@ -89,10 +89,12 @@ function draw() {
 		fill(0, 0, 0);
 
 	}
+	translate(0,0,60)
 	for (let judge of jCircle) image(judge);
+	translate(0,0,-60)
 	//the notes that have been spawned are controlled here
 	fill(255, 255, 255);
-	translate(0,0,15)
+	translate(0,0,5)
 	for (let collum of notemap) {
 		//draw all notes
 		for (let note of collum) {
@@ -107,7 +109,7 @@ function draw() {
 			}
 		}
 	}
-	translate(0,0,-15)
+	translate(0,0,-5)
 	//this will spawn a note every *note density value*
 	translate(0,0,5)
 	if (millis() >= 1 + timer) {
