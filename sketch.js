@@ -8,7 +8,7 @@ function setup() {
 	nDesnsity.position(0, 0);
 	scrollSpeed = createSlider(1, 12);
 	scrollSpeed.position(0, 20);
-	frameRate(60);
+	frameRate(240);
 	keyImg = loadImage('assets/key.png');
 	keyPress = loadImage('assets/keyPressed.png');
 	note1 = loadImage('assets/note.png');
@@ -27,9 +27,9 @@ let tColor = (255, 0, 255);
 let keys = [false, false, false, false];
 let jColor = (255, 255, 255);
 
-let hits = 0
-let combo = 0
-let misses = 0
+let hits = 0;
+let combo = 0;
+let misses = 0;
 
 function draw() {
 	//resize canvas on every update, in case of window size change
@@ -71,11 +71,10 @@ function draw() {
 	//the notes that have been spawned are controlled here
 	fill(255, 255, 255);
 	for (let collum of notemap) {
-		//this orchestrates their motion
+		//draw all notes
 		for (let note of collum) {
 			fill(0, 255, 255);
 			image(note.image, note.x, note.y, note.w, note.h);
-			note.y += scrollSpeed.value();
 		}
 		//and here removes them if they are past the judgement line
 		for (let i = 0; i < collum.length; i++) {
@@ -83,6 +82,13 @@ function draw() {
 		}
 	}
 	//this will spawn a note every *note density value*
+
+	if (millis() >= 1 + timer) {
+		for (let collum of notemap)
+			for (let note of collum) {
+				note.y += scrollSpeed.value() / 3;
+			}
+	}
 	if (millis() >= nDesnsity.value() + timer) {
 		fps = frameRate();
 		dropCircle();
@@ -95,6 +101,9 @@ function draw() {
 	text('FPS: ' + fps.toFixed(0), -950, -325);
 	fill(255, 255, 255);
 	text('secs: ' + (millis() / 1000).toFixed(0), -950, -350);
+	text('hits:' + hits, -950, -300);
+	text('combo:' + combo, -950, -275);
+	text('miss:' + misses, -950, -250);
 	x = -tSize / 4 - tSize / 8;
 
 	//this will draw the keys at the bottom
@@ -103,9 +112,9 @@ function draw() {
 		x += tSize / 4;
 	}
 }
-function hit(distance){
-	combo++
-	hits++
+function hit(distance) {
+	combo++;
+	hits++;
 }
 
 function keyPressed() {
@@ -113,7 +122,9 @@ function keyPressed() {
 		keys[0] = true;
 		let collum = notemap[0];
 		for (let i = 0; i < collum.length; i++) {
-			if (302 - collum[i].y < 50) {
+			let dist = 302 - collum[i].y;
+			if (dist < 50) {
+				hit(dist)
 				collum.splice(i, 1);
 			}
 		}
@@ -122,7 +133,9 @@ function keyPressed() {
 		keys[1] = true;
 		let collum = notemap[1];
 		for (let i = 0; i < collum.length; i++) {
-			if (302 - collum[i].y < 50) {
+			let dist = 302 - collum[i].y;
+			if (dist < 50) {
+				hit(dist)
 				collum.splice(i, 1);
 			}
 		}
@@ -131,7 +144,9 @@ function keyPressed() {
 		keys[2] = true;
 		let collum = notemap[2];
 		for (let i = 0; i < collum.length; i++) {
-			if (302 - collum[i].y < 50) {
+			let dist = 302 - collum[i].y;
+			if (dist < 50) {
+				hit(dist)
 				collum.splice(i, 1);
 			}
 		}
@@ -140,11 +155,14 @@ function keyPressed() {
 		keys[3] = true;
 		let collum = notemap[3];
 		for (let i = 0; i < collum.length; i++) {
-			if (302 - collum[i].y < 50) {
+			let dist = 302 - collum[i].y;
+			if (dist < 50) {
+				hit(dist)
 				collum.splice(i, 1);
 			}
 		}
 	}
+
 }
 
 function keyReleased() {
