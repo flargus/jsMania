@@ -3,8 +3,8 @@ let scrollSpeed;
 let keyImg;
 let noteImg;
 function setup() {
-	createCanvas(windowWidth, windowHeight);
-	nDesnsity = createSlider(100, 1000);
+	createCanvas(windowWidth, windowHeight, WEBGL);
+	nDesnsity = createSlider(200, 1000);
 	nDesnsity.position(0, 0);
 	scrollSpeed = createSlider(1, 12);
 	scrollSpeed.position(0, 20);
@@ -13,6 +13,8 @@ function setup() {
 	keyPress = loadImage('assets/keyPressed.png');
 	note1 = loadImage('assets/note.png');
 	note2 = loadImage('assets/note2.png');
+	let font = loadFont('/assets/futuraBook.otf');
+	textFont(font);
 	noteImgs = [note1, note2];
 }
 
@@ -30,46 +32,67 @@ let jColor = (255, 255, 255);
 let hits = 0;
 let combo = 0;
 let misses = 0;
-
+let ttHeight;
 function draw() {
 	//resize canvas on every update, in case of window size change
 	resizeCanvas(windowWidth, windowHeight);
+	translate(0,0)
 	let fps = frameRate();
 	let foo = [];
 	let bar = [];
 	let vs = [];
+	let tHeight = windowHeight;
+	ttHeight = tHeight;
 	const tSize = windowWidth * 0.2;
 	background(25, 25, 25);
 	fill(126, 126, 126);
 	imageMode(CENTER);
 	rectMode(CENTER);
-	translate(width / 2, height / 2);
-	let track = rect(0, 0, tSize + 10, height);
+	//let track = rect(0, 0, tSize + 10, height);
 	fill(0, 0, 0);
 	x = -tSize / 4 - tSize / 8;
-
-	for (let judge of jCircle) image(judge);
+	fill(255);
+	text('FPS: ' + fps.toFixed(0), -950, -325);
+	text('secs: ' + (millis() / 1000).toFixed(0), -950, -200);
+	text('hits:' + hits, -950, -175);
+	text('combo:' + combo, -950, -150);
+	text('miss:' + misses, -950, -125);
+	fill(0);
+	strokeWeight(0);
+	rotateX(1);
 
 	//here, if the corresponding key is pressed, the image of a pressed key is shown
 	//this is referred to as the judgement line
 	for (let i = 0; i < 4; i++) {
-		foo.push(rect(x, 0, tSize / 4, height));
+		translate(0,0,-15)
+		foo.push(rect(x, 0, tSize / 4 + 10, tHeight+17000));
+		translate(0,0,15)
 		bar.push(x);
-		if (keys[0] && i === 0)
+		if (keys[0] && i === 0) {
+			if(rotationY != -0.25) { rotateY(-0.05)}
 			image(keyPress, x, 302, width * 0.045, width * 0.045 * 1.92);
-		if (keys[1] && i === 1)
+		}
+		if (keys[1] && i === 1) {
 			image(keyPress, x, 302, width * 0.045, width * 0.045 * 1.92);
-		if (keys[2] && i === 2)
+			if(rotationY != -0.25) { rotateY(-0.025)}
+		}
+		if (keys[2] && i === 2) {
 			image(keyPress, x, 302, width * 0.045, width * 0.045 * 1.92);
-		if (keys[3] && i === 3)
+			if(rotationY != -0.25) { rotateY(0.05)}
+		}
+		if (keys[3] && i === 3) {
 			image(keyPress, x, 302, width * 0.045, width * 0.045 * 1.92);
+			if(rotationY != -0.25) { rotateY(0.025)}
+		}
 
 		x += tSize / 4;
 		fill(0, 0, 0);
-	}
 
+	}
+	for (let judge of jCircle) image(judge);
 	//the notes that have been spawned are controlled here
 	fill(255, 255, 255);
+	translate(0,0,15)
 	for (let collum of notemap) {
 		//draw all notes
 		for (let note of collum) {
@@ -78,15 +101,20 @@ function draw() {
 		}
 		//and here removes them if they are past the judgement line
 		for (let i = 0; i < collum.length; i++) {
-			if (collum[i].y >= 400) collum.splice(i, 1);
+			if (collum[i].y >= 400) {
+				collum.splice(i, 1);
+				miss();
+			}
 		}
 	}
+	translate(0,0,-15)
 	//this will spawn a note every *note density value*
-
+	translate(0,0,5)
 	if (millis() >= 1 + timer) {
 		for (let collum of notemap)
 			for (let note of collum) {
 				note.y += scrollSpeed.value() / 3;
+				note.set;
 			}
 	}
 	if (millis() >= nDesnsity.value() + timer) {
@@ -98,12 +126,7 @@ function draw() {
 	lanes = foo;
 	lanePos = bar;
 	jCircle = vs;
-	text('FPS: ' + fps.toFixed(0), -950, -325);
-	fill(255, 255, 255);
-	text('secs: ' + (millis() / 1000).toFixed(0), -950, -350);
-	text('hits:' + hits, -950, -300);
-	text('combo:' + combo, -950, -275);
-	text('miss:' + misses, -950, -250);
+
 	x = -tSize / 4 - tSize / 8;
 
 	//this will draw the keys at the bottom
@@ -117,6 +140,11 @@ function hit(distance) {
 	hits++;
 }
 
+function miss() {
+	combo = 0;
+	misses++;
+}
+
 function keyPressed() {
 	if (key == 'd') {
 		keys[0] = true;
@@ -124,7 +152,7 @@ function keyPressed() {
 		for (let i = 0; i < collum.length; i++) {
 			let dist = 302 - collum[i].y;
 			if (dist < 50) {
-				hit(dist)
+				hit(dist);
 				collum.splice(i, 1);
 			}
 		}
@@ -135,7 +163,7 @@ function keyPressed() {
 		for (let i = 0; i < collum.length; i++) {
 			let dist = 302 - collum[i].y;
 			if (dist < 50) {
-				hit(dist)
+				hit(dist);
 				collum.splice(i, 1);
 			}
 		}
@@ -146,7 +174,7 @@ function keyPressed() {
 		for (let i = 0; i < collum.length; i++) {
 			let dist = 302 - collum[i].y;
 			if (dist < 50) {
-				hit(dist)
+				hit(dist);
 				collum.splice(i, 1);
 			}
 		}
@@ -157,12 +185,11 @@ function keyPressed() {
 		for (let i = 0; i < collum.length; i++) {
 			let dist = 302 - collum[i].y;
 			if (dist < 50) {
-				hit(dist)
+				hit(dist);
 				collum.splice(i, 1);
 			}
 		}
 	}
-
 }
 
 function keyReleased() {
@@ -178,7 +205,7 @@ function dropCircle() {
 	note = {
 		image: collum === 1 || collum === 2 ? note2 : note1,
 		x: lanePos[collum],
-		y: -height / 2,
+		y: -8000,
 		w: windowWidth * 0.02 * 2.56,
 		h: windowWidth * 0.02 * 1.88,
 		color: (0, 225, 255)
