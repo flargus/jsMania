@@ -52,10 +52,9 @@ function draw() {
 	}
 	fill(255, 255, 255);
 	for(let collum of notemap){
-		console.log(collum)
-		for (let note of notemap) {
-			console.log(note)
+		for (let note of collum) {
 			push();
+			console.log(note)
 			fill(0, 255, 255);
 			ellipse(note.x, note.y, note.w, note.h);
 			note.y += scrollSpeed.value();
