@@ -1,11 +1,18 @@
+let nDesnsity;
+let scrollSpeed;
 function setup() {
 	createCanvas(windowWidth, windowHeight);
+	nDesnsity = createSlider(100, 1000);
+	nDesnsity.position(0, 0);
+	scrollSpeed = createSlider(1, 30);
+	scrollSpeed.position(0, 20);
 }
 
 let lanes = [];
 let lanePos = [];
 let timer = 0;
 let notes = [];
+let notemap = [[],[],[],[]];
 let jCircle = [];
 let kp = [false, false, false, false];
 let tColor = (255, 0, 255);
@@ -44,28 +51,38 @@ function draw() {
 		fill(255, 255, 255);
 	}
 	fill(255, 255, 255);
-	for (let note of notes) {
-		push();
-		fill(0, 255, 255);
-		ellipse(note.x, note.y, note.w, note.h);
-		note.y += 25;
-		pop();
+	for(let collum of notemap){
+		console.log(collum)
+		for (let note of notemap) {
+			console.log(note)
+			push();
+			fill(0, 255, 255);
+			ellipse(note.x, note.y, note.w, note.h);
+			note.y += scrollSpeed.value();
+			pop();
+		}
 	}
-	if (millis() >= 500 + timer) {
+
+	if (millis() >= nDesnsity.value() + timer) {
 		dropCircle();
 		timer = millis();
 	}
 	for (let i = 0; i < 4; i++) {
 		kp[i] = false;
 	}
-
+	if (notemap.length >= 40) {
+		notemap.shift();
+	}
 	lanes = foo;
 	lanePos = bar;
 	jCircle = vs;
 }
 
 function keyPressed() {
-	if (key == 'd')  keys[0] = true;
+	if (key == 'd') {
+		keys[0] = true
+
+	};
 	if (key === 'f') keys[1] = true;
 	if (key === 'j') keys[2] = true;
 	if (key === 'k') keys[3] = true;
@@ -79,12 +96,13 @@ function keyReleased() {
 }
 
 function dropCircle() {
+	let collum =Math.floor(random(0, 4));
 	note = {
-		x: lanePos[Math.floor(random(0, 4))],
+		x: lanePos[collum],
 		y: -height / 2,
 		w: windowWidth * 0.045,
 		h: windowWidth * 0.045,
 		color: (0, 225, 255)
 	};
-	notes.push(note);
+	notemap.push([collum, note]);
 }
