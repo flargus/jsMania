@@ -1,7 +1,16 @@
 let nDesnsity;
 let scrollSpeed;
+let hitSound;
 let keyImg;
 let noteImg;
+function preload() {
+	keyImg = loadImage('assets/key.png');
+	keyPress = loadImage('assets/keyPressed.png');
+	note1 = loadImage('assets/note.png');
+	note2 = loadImage('assets/note2.png');
+	hitSound = loadSound('assets/normal-hitnormal.ogg');
+}
+
 function setup() {
 	createCanvas(windowWidth, windowHeight, WEBGL);
 	nDesnsity = createSlider(200, 1000);
@@ -9,10 +18,6 @@ function setup() {
 	scrollSpeed = createSlider(1, 12);
 	scrollSpeed.position(0, 20);
 	frameRate(240);
-	keyImg = loadImage('assets/key.png');
-	keyPress = loadImage('assets/keyPressed.png');
-	note1 = loadImage('assets/note.png');
-	note2 = loadImage('assets/note2.png');
 	let font = loadFont('/assets/futuraBook.otf');
 	textFont(font);
 	noteImgs = [note1, note2];
@@ -56,7 +61,7 @@ function draw() {
 	fill(0, 0, 0);
 	x = -tSize / 4 - tSize / 8;
 	fill(255);
-	textSize(30)
+	textSize(30);
 	text('FPS: ' + fps.toFixed(0), -950, -325);
 	text('secs: ' + (millis() / 1000).toFixed(0), -950, -200);
 	text('hits:' + hits, -950, -175);
@@ -165,48 +170,21 @@ function miss() {
 }
 
 function keyPressed() {
-	if (key == 'd') {
-		keys[0] = true;
-		let collum = notemap[0];
-		for (let i = 0; i < collum.length; i++) {
-			let dist = 415 - collum[i].y;
-			if (dist < 50) {
-				hit(dist);
-				collum.splice(i, 1);
-			}
-		}
-	}
-	if (key == 'f') {
-		keys[1] = true;
-		let collum = notemap[1];
-		for (let i = 0; i < collum.length; i++) {
-			let dist = 415 - collum[i].y;
-			if (dist < 50) {
-				hit(dist);
-				collum.splice(i, 1);
-			}
-		}
-	}
-	if (key == 'j') {
-		keys[2] = true;
-		let collum = notemap[2];
-		for (let i = 0; i < collum.length; i++) {
-			let dist = 415 - collum[i].y;
-			if (dist < 50) {
-				hit(dist);
-				collum.splice(i, 1);
-			}
-		}
-	}
-	if (key == 'k') {
-		keys[3] = true;
-		let collum = notemap[3];
-		for (let i = 0; i < collum.length; i++) {
-			let dist = 415 - collum[i].y;
-			if (dist < 50) {
-				hit(dist);
-				collum.splice(i, 1);
-			}
+	if (key === 'd') handleKeyPress(0);
+	if (key === 'f') handleKeyPress(1);
+	if (key === 'j') handleKeyPress(2);
+	if (key === 'k') handleKeyPress(3);
+}
+
+function handleKeyPress(key) {
+	keys[key] = true;
+	let collum = notemap[key];
+	for (let i = 0; i < collum.length; i++) {
+		let dist = 415 - collum[i].y;
+		if (dist < 50) {
+			hitSound.play();
+			hit(dist);
+			collum.splice(i, 1);
 		}
 	}
 }
