@@ -3,12 +3,14 @@ let scrollSpeed;
 let hitSound;
 let keyImg;
 let noteImg;
+let face;
 function preload() {
 	keyImg = loadImage('assets/key.png');
 	keyPress = loadImage('assets/keyPressed.png');
 	note1 = loadImage('assets/note.png');
 	note2 = loadImage('assets/note2.png');
 	hitSound = loadSound('assets/normal-hitnormal.ogg');
+	face = loadImage('assets/face.png')
 }
 
 function setup() {
@@ -41,7 +43,6 @@ let ttHeight;
 function draw() {
 	//resize canvas on every update, in case of window size change
 	resizeCanvas(windowWidth, windowHeight);
-	debugMode();
 	translate(0, 0);
 	let fps = frameRate();
 	let foo = [];
@@ -157,6 +158,9 @@ function draw() {
 		x += tSize / 4;
 	}
 	translate(0, 0, 20);
+	rotateX(-1.25)
+	translate(0,0,-500)
+	image(face,-40,-200,800,800)
 }
 function hit(distance) {
 	combo++;
