@@ -36,7 +36,8 @@ let ttHeight;
 function draw() {
 	//resize canvas on every update, in case of window size change
 	resizeCanvas(windowWidth, windowHeight);
-	translate(0,0)
+	debugMode();
+	translate(0, 0);
 	let fps = frameRate();
 	let foo = [];
 	let bar = [];
@@ -45,10 +46,13 @@ function draw() {
 	ttHeight = tHeight;
 	const tSize = windowWidth * 0.2;
 	background(25, 25, 25);
+
+	lights();
+
 	fill(126, 126, 126);
 	imageMode(CENTER);
 	rectMode(CENTER);
-	//let track = rect(0, 0, tSize + 10, height);
+
 	fill(0, 0, 0);
 	x = -tSize / 4 - tSize / 8;
 	fill(255);
@@ -59,42 +63,50 @@ function draw() {
 	text('miss:' + misses, -950, -125);
 	fill(0);
 	strokeWeight(0);
-	rotateX(1);
-
+	rotateX(1.25);
 	//here, if the corresponding key is pressed, the image of a pressed key is shown
 	//this is referred to as the judgement line
 	for (let i = 0; i < 4; i++) {
-		translate(0,0,-15)
-		foo.push(rect(x, 0, tSize / 4 + 10, tHeight+17000));
-		translate(0,0,15)
+		translate(0, 0, -25);
+		foo.push(rect(x, 0, tSize / 4 + 10, tHeight + 2000));
+		translate(0, 0, 25);
+		translate(0, 0, 15);
 		bar.push(x);
 		if (keys[0] && i === 0) {
-			if(rotationY != -0.25) { rotateY(-0.05)}
-			image(keyPress, x, 302, width * 0.045, width * 0.045 * 1.92);
+			if (rotationY != -0.25) {
+				rotateY(-0.05);
+			}
+			image(keyPress, x, 415, width * 0.045, width * 0.045 * 1.92);
 		}
 		if (keys[1] && i === 1) {
-			image(keyPress, x, 302, width * 0.045, width * 0.045 * 1.92);
-			if(rotationY != -0.25) { rotateY(-0.025)}
+			image(keyPress, x, 415, width * 0.045, width * 0.045 * 1.92);
+			if (rotationY != -0.25) {
+				rotateY(-0.025);
+			}
 		}
 		if (keys[2] && i === 2) {
-			image(keyPress, x, 302, width * 0.045, width * 0.045 * 1.92);
-			if(rotationY != -0.25) { rotateY(0.05)}
+			image(keyPress, x, 415, width * 0.045, width * 0.045 * 1.92);
+			if (rotationY != -0.25) {
+				rotateY(0.05);
+			}
 		}
 		if (keys[3] && i === 3) {
-			image(keyPress, x, 302, width * 0.045, width * 0.045 * 1.92);
-			if(rotationY != -0.25) { rotateY(0.025)}
+			image(keyPress, x, 415, width * 0.045, width * 0.045 * 1.92);
+			if (rotationY != -0.25) {
+				rotateY(0.025);
+			}
 		}
-
+		translate(0, 0, -15);
 		x += tSize / 4;
 		fill(0, 0, 0);
-
 	}
-	translate(0,0,60)
-	for (let judge of jCircle) image(judge);
-	translate(0,0,-60)
+	// translate(0, 0, 15);
+	// for (let judge of jCircle) image(judge);
+	// translate(0, 0, -15);
 	//the notes that have been spawned are controlled here
 	fill(255, 255, 255);
-	translate(0,0,5)
+	translate(0, 0, 5);
+	rotateX(-0.025);
 	for (let collum of notemap) {
 		//draw all notes
 		for (let note of collum) {
@@ -109,9 +121,10 @@ function draw() {
 			}
 		}
 	}
-	translate(0,0,-5)
+	rotateX(0.025);
+	translate(0, 0, -5);
 	//this will spawn a note every *note density value*
-	translate(0,0,5)
+	translate(0,0,20)
 	if (millis() >= 1 + timer) {
 		for (let collum of notemap)
 			for (let note of collum) {
@@ -124,18 +137,19 @@ function draw() {
 		dropCircle();
 		timer = millis();
 	}
-
+	translate(0,0-20)
 	lanes = foo;
 	lanePos = bar;
 	jCircle = vs;
 
 	x = -tSize / 4 - tSize / 8;
-
+	translate(0,0,-20)
 	//this will draw the keys at the bottom
 	for (i = 0; i < 4; i++) {
-		image(keyImg, x, 350, width * 0.05, width * 0.05 * 3);
+		image(keyImg, x, 450, width * 0.05, width * 0.05 * 3);
 		x += tSize / 4;
 	}
+	translate(0,0,20)
 }
 function hit(distance) {
 	combo++;
@@ -152,7 +166,7 @@ function keyPressed() {
 		keys[0] = true;
 		let collum = notemap[0];
 		for (let i = 0; i < collum.length; i++) {
-			let dist = 302 - collum[i].y;
+			let dist = 415 - collum[i].y;
 			if (dist < 50) {
 				hit(dist);
 				collum.splice(i, 1);
@@ -163,7 +177,7 @@ function keyPressed() {
 		keys[1] = true;
 		let collum = notemap[1];
 		for (let i = 0; i < collum.length; i++) {
-			let dist = 302 - collum[i].y;
+			let dist = 415 - collum[i].y;
 			if (dist < 50) {
 				hit(dist);
 				collum.splice(i, 1);
@@ -174,7 +188,7 @@ function keyPressed() {
 		keys[2] = true;
 		let collum = notemap[2];
 		for (let i = 0; i < collum.length; i++) {
-			let dist = 302 - collum[i].y;
+			let dist = 415 - collum[i].y;
 			if (dist < 50) {
 				hit(dist);
 				collum.splice(i, 1);
@@ -185,7 +199,7 @@ function keyPressed() {
 		keys[3] = true;
 		let collum = notemap[3];
 		for (let i = 0; i < collum.length; i++) {
-			let dist = 302 - collum[i].y;
+			let dist = 415 - collum[i].y;
 			if (dist < 50) {
 				hit(dist);
 				collum.splice(i, 1);
@@ -207,7 +221,7 @@ function dropCircle() {
 	note = {
 		image: collum === 1 || collum === 2 ? note2 : note1,
 		x: lanePos[collum],
-		y: -8000,
+		y: -1400,
 		w: windowWidth * 0.02 * 2.56,
 		h: windowWidth * 0.02 * 1.88,
 		color: (0, 225, 255)
