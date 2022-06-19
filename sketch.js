@@ -78,30 +78,35 @@ function draw() {
 		translate(0, 0, 25);
 		translate(0, 0, -5);
 		bar.push(x);
-		if (keys[0] && i === 0) {
-			if (rotationY != -0.25) {
-				rotateY(-0.05);
-			}
-			image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
-		}
-		if (keys[1] && i === 1) {
-			image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
-			if (rotationY != -0.25) {
-				rotateY(-0.025);
+		for(let j = 0; j< 4; j++){
+			if(keys[j] && i == j){
+				image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
 			}
 		}
-		if (keys[2] && i === 2) {
-			image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
-			if (rotationY != -0.25) {
-				rotateY(0.05);
-			}
-		}
-		if (keys[3] && i === 3) {
-			image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
-			if (rotationY != -0.25) {
-				rotateY(0.025);
-			}
-		}
+		// if (keys[0] && i === 0) {
+		// 	if (rotationY != -0.25) {
+		// 		rotateY(-0.05);
+		// 	}
+		// 	image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
+		// }
+		// if (keys[1] && i === 1) {
+		// 	image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
+		// 	if (rotationY != -0.25) {
+		// 		rotateY(-0.025);
+		// 	}
+		// }
+		// if (keys[2] && i === 2) {
+		// 	image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
+		// 	if (rotationY != -0.25) {
+		// 		rotateY(0.05);
+		// 	}
+		// }
+		// if (keys[3] && i === 3) {
+		// 	image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
+		// 	if (rotationY != -0.25) {
+		// 		rotateY(0.025);
+		// 	}
+		// }
 
 		x += tSize / 4;
 		fill(0, 0, 0);
@@ -180,8 +185,8 @@ function handleKeyPress(key) {
 	keys[key] = true;
 	let collum = notemap[key];
 	for (let i = 0; i < collum.length; i++) {
-		let dist = 415 - collum[i].y;
-		if (dist < 50) {
+		let dist = 400 - collum[i].y;
+		if (dist < 100) {
 			hitSound.play();
 			hit(dist);
 			collum.splice(i, 1);
