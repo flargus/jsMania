@@ -28,11 +28,11 @@ let kp = [false, false, false, false];
 let tColor = (255, 0, 255);
 let keys = [false, false, false, false];
 let jColor = (255, 255, 255);
-
 let hits = 0;
 let combo = 0;
 let misses = 0;
 let ttHeight;
+
 function draw() {
 	//resize canvas on every update, in case of window size change
 	resizeCanvas(windowWidth, windowHeight);
@@ -56,10 +56,11 @@ function draw() {
 	fill(0, 0, 0);
 	x = -tSize / 4 - tSize / 8;
 	fill(255);
+	textSize(30)
 	text('FPS: ' + fps.toFixed(0), -950, -325);
 	text('secs: ' + (millis() / 1000).toFixed(0), -950, -200);
 	text('hits:' + hits, -950, -175);
-	text('combo:' + combo, -950, -150);
+	text(combo, 0, -300);
 	text('miss:' + misses, -950, -125);
 	fill(0);
 	strokeWeight(0);
