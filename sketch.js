@@ -78,41 +78,35 @@ function draw() {
 		translate(0, 0, 25);
 		translate(0, 0, -5);
 		bar.push(x);
-		for(let j = 0; j< 4; j++){
-			if(keys[j] && i == j){
+		for (let j = 0; j < 4; j++) {
+			if (keys[j] && i == j) {
 				image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
 			}
 		}
-		// if (keys[0] && i === 0) {
-		// 	if (rotationY != -0.25) {
-		// 		rotateY(-0.05);
-		// 	}
-		// 	image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
-		// }
-		// if (keys[1] && i === 1) {
-		// 	image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
-		// 	if (rotationY != -0.25) {
-		// 		rotateY(-0.025);
-		// 	}
-		// }
-		// if (keys[2] && i === 2) {
-		// 	image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
-		// 	if (rotationY != -0.25) {
-		// 		rotateY(0.05);
-		// 	}
-		// }
-		// if (keys[3] && i === 3) {
-		// 	image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
-		// 	if (rotationY != -0.25) {
-		// 		rotateY(0.025);
-		// 	}
-		// }
 
 		x += tSize / 4;
 		fill(0, 0, 0);
 		translate(0, 0, 5);
 	}
 
+	for (let i = 0; i < 4; i++) {
+		if (keys[i]) {
+			switch (i) {
+				case 0:
+					rotateY(-0.02);
+					break;
+				case 1:
+					rotateY(-0.01);
+					break;
+				case 2:
+					rotateY(0.01);
+					break;
+				case 3:
+					rotateY(0.02);
+					break;
+			}
+		}
+	}
 	// translate(0, 0, 15);
 	// for (let judge of jCircle) image(judge);
 	// translate(0, 0, -15);
@@ -141,7 +135,7 @@ function draw() {
 	if (millis() >= 1 + timer) {
 		for (let collum of notemap)
 			for (let note of collum) {
-				note.y += scrollSpeed.value() ;
+				note.y += scrollSpeed.value();
 				note.set;
 			}
 	}
