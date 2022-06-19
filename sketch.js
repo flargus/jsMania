@@ -70,36 +70,38 @@ function draw() {
 		translate(0, 0, -25);
 		foo.push(rect(x, 0, tSize / 4 + 10, tHeight + 2000));
 		translate(0, 0, 25);
-		translate(0, 0, 15);
+		translate(0, 0, -1);
 		bar.push(x);
 		if (keys[0] && i === 0) {
 			if (rotationY != -0.25) {
 				rotateY(-0.05);
 			}
-			image(keyPress, x, 415, width * 0.045, width * 0.045 * 1.92);
+			image(keyPress, x, 410, width * 0.045, width * 0.045 * 1.92);
 		}
 		if (keys[1] && i === 1) {
-			image(keyPress, x, 415, width * 0.045, width * 0.045 * 1.92);
+			image(keyPress, x, 410, width * 0.045, width * 0.045 * 1.92);
 			if (rotationY != -0.25) {
 				rotateY(-0.025);
 			}
 		}
 		if (keys[2] && i === 2) {
-			image(keyPress, x, 415, width * 0.045, width * 0.045 * 1.92);
+			image(keyPress, x, 410, width * 0.045, width * 0.045 * 1.92);
 			if (rotationY != -0.25) {
 				rotateY(0.05);
 			}
 		}
 		if (keys[3] && i === 3) {
-			image(keyPress, x, 415, width * 0.045, width * 0.045 * 1.92);
+			image(keyPress, x, 410, width * 0.045, width * 0.045 * 1.92);
 			if (rotationY != -0.25) {
 				rotateY(0.025);
 			}
 		}
-		translate(0, 0, -15);
+
 		x += tSize / 4;
 		fill(0, 0, 0);
+		translate(0, 0, 1);
 	}
+
 	// translate(0, 0, 15);
 	// for (let judge of jCircle) image(judge);
 	// translate(0, 0, -15);
@@ -115,7 +117,7 @@ function draw() {
 		}
 		//and here removes them if they are past the judgement line
 		for (let i = 0; i < collum.length; i++) {
-			if (collum[i].y >= 400) {
+			if (collum[i].y >= 500) {
 				collum.splice(i, 1);
 				miss();
 			}
@@ -124,7 +126,7 @@ function draw() {
 	rotateX(0.025);
 	translate(0, 0, -5);
 	//this will spawn a note every *note density value*
-	translate(0,0,20)
+	translate(0, 0, 20);
 	if (millis() >= 1 + timer) {
 		for (let collum of notemap)
 			for (let note of collum) {
@@ -137,19 +139,19 @@ function draw() {
 		dropCircle();
 		timer = millis();
 	}
-	translate(0,0-20)
+	translate(0, 0 - 20);
 	lanes = foo;
 	lanePos = bar;
 	jCircle = vs;
 
 	x = -tSize / 4 - tSize / 8;
-	translate(0,0,-20)
+	translate(0, 0, -20);
 	//this will draw the keys at the bottom
 	for (i = 0; i < 4; i++) {
 		image(keyImg, x, 450, width * 0.05, width * 0.05 * 3);
 		x += tSize / 4;
 	}
-	translate(0,0,20)
+	translate(0, 0, 20);
 }
 function hit(distance) {
 	combo++;
