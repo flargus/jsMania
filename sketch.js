@@ -16,7 +16,7 @@ function setup() {
 	nDesnsity = createSlider(200, 1000);
 	nDesnsity.position(0, 0);
 	scrollSpeed = createSlider(1, 12);
-	scrollSpeed.position(0, 20);
+	scrollSpeed.position(0, 30);
 	frameRate(240);
 	let font = loadFont('/assets/futuraBook.otf');
 	textFont(font);
@@ -76,28 +76,28 @@ function draw() {
 		translate(0, 0, -25);
 		foo.push(rect(x, 0, tSize / 4 + 10, tHeight + 2000));
 		translate(0, 0, 25);
-		translate(0, 0, -1);
+		translate(0, 0, -5);
 		bar.push(x);
 		if (keys[0] && i === 0) {
 			if (rotationY != -0.25) {
 				rotateY(-0.05);
 			}
-			image(keyPress, x, 410, width * 0.045, width * 0.045 * 1.92);
+			image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
 		}
 		if (keys[1] && i === 1) {
-			image(keyPress, x, 410, width * 0.045, width * 0.045 * 1.92);
+			image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
 			if (rotationY != -0.25) {
 				rotateY(-0.025);
 			}
 		}
 		if (keys[2] && i === 2) {
-			image(keyPress, x, 410, width * 0.045, width * 0.045 * 1.92);
+			image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
 			if (rotationY != -0.25) {
 				rotateY(0.05);
 			}
 		}
 		if (keys[3] && i === 3) {
-			image(keyPress, x, 410, width * 0.045, width * 0.045 * 1.92);
+			image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
 			if (rotationY != -0.25) {
 				rotateY(0.025);
 			}
@@ -105,7 +105,7 @@ function draw() {
 
 		x += tSize / 4;
 		fill(0, 0, 0);
-		translate(0, 0, 1);
+		translate(0, 0, 5);
 	}
 
 	// translate(0, 0, 15);
@@ -136,7 +136,7 @@ function draw() {
 	if (millis() >= 1 + timer) {
 		for (let collum of notemap)
 			for (let note of collum) {
-				note.y += scrollSpeed.value() / 3;
+				note.y += scrollSpeed.value() ;
 				note.set;
 			}
 	}
