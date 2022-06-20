@@ -27,6 +27,7 @@ function setup() {
 	noteImgs = [note1, note2];
 }
 
+let lates = [];
 let lanes = [];
 let lanePos = [];
 let timer = 0;
@@ -117,16 +118,17 @@ function draw() {
 	fill(255, 255, 255);
 	translate(0, 0, 5);
 	rotateX(-0.025);
-	for (let collum of notemap) {
+	for (let column of notemap) {
 		//draw all notes
-		for (let note of collum) {
+		for (let note of column) {
 			fill(0, 255, 255);
 			image(note.image, note.x, note.y, note.w, note.h);
 		}
 		//and here removes them if they are past the judgement line
-		for (let i = 0; i < collum.length; i++) {
-			if (collum[i].y >= 500) {
-				collum.splice(i, 1);
+		for (let i = 0; i < column.length; i++) {
+			if (column[i].y >= 600) {
+				lates.push(column[i]);
+				column.splice(i, 1);
 				miss();
 			}
 		}
@@ -136,8 +138,8 @@ function draw() {
 	//this will spawn a note every *note density value*
 	translate(0, 0, 20);
 	if (millis() >= 1 + timer) {
-		for (let collum of notemap)
-			for (let note of collum) {
+		for (let column of notemap)
+			for (let note of column) {
 				note.y += scrollSpeed.value();
 				note.set;
 			}
@@ -181,13 +183,13 @@ function keyPressed() {
 
 function handleKeyPress(key) {
 	keys[key] = true;
-	let collum = notemap[key];
-	for (let i = 0; i < collum.length; i++) {
-		let dist = 400 - collum[i].y;
+	let column = notemap[key];
+	for (let i = 0; i < column.length; i++) {
+		let dist = 400 - column[i].y;
 		if (dist < 100) {
 			hitSound.play();
 			hit(dist);
-			collum.splice(i, 1);
+			column.splice(i, 1);
 		}
 	}
 }
@@ -200,15 +202,15 @@ function keyReleased() {
 }
 
 function dropCircle() {
-	let collum = Math.floor(random(0, 4));
+	let column = Math.floor(random(0, 4));
 	//define the position of the note, this is added to the notemap and subsequently used in draw()
 	note = {
-		image: collum === 1 || collum === 2 ? note2 : note1,
-		x: lanePos[collum],
+		image: column === 1 || column === 2 ? note2 : note1,
+		x: lanePos[column],
 		y: -1400,
 		w: windowWidth * 0.02 * 2.56,
 		h: windowWidth * 0.02 * 1.88,
 		color: (0, 225, 255)
 	};
-	notemap[collum].push(note);
+	notemap[column].push(note);
 }
