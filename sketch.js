@@ -131,21 +131,22 @@ function draw() {
 					break;
 				case 'slider':
 					image(note.image, note.x, note.y, note.w, note.h);
-					if (note.length > 0) {
-						note.midOffset -= width * 0.02 * 0.86;
-						note.length -= 86;
-						midSlider(note.x, note.y + note.midOffset, note.col);
-					} else {
-						tailSlider(note.x, note.y + note.midOffset, note.col);
-					}
-					break;
+					image(note.image, note.x, note.y - note.length, note.w, note.h);
+				// if (note.length > 0) {
+				// 	note.midOffset -= width * 0.02 * 0.86;
+				// 	note.length -= 86;
+				// 	midSlider(note.x, note.y + note.midOffset, note.col);
+				// } else {
+				// 	tailSlider(note.x, note.y + note.midOffset, note.col);
+				// }
+				// break;
 				case 'section':
 					image(note.image, note.x, note.y, note.w, note.h);
 					break;
 				case 'tail':
-					rotateY(1);
+					rotateZ(90);
 					image(note.image, note.x, note.y, note.w, note.h);
-					rotateY(-1);
+					rotateZ(-90);
 			}
 		}
 		//and here removes them if they are past the judgement line
@@ -170,7 +171,7 @@ function draw() {
 	}
 	if (millis() >= nDesnsity.value() + timer) {
 		fps = frameRate();
-		//dropCircle();
+		dropCircle();
 		timer = millis();
 	}
 	if (lates.length > 30) {
@@ -265,7 +266,7 @@ function dropCircle() {
 }
 
 function dropSlider() {
-	let column = Math.floor(random(0.4));
+	let column = Math.floor(random(0, 4));
 	slider = {
 		type: 'slider',
 		image: sliderTop,
