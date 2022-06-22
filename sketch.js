@@ -45,6 +45,7 @@ let combo = 0;
 let misses = 0;
 let ttHeight;
 let rotateFrame = false;
+let sliderId = 0;
 
 function draw() {
 	//resize canvas on every update, in case of window size change
@@ -76,13 +77,14 @@ function draw() {
 	fill(0);
 	strokeWeight(0);
 	rotateX(1.25);
+	// rotateZ(millis() / 500);
+	// rotateY(millis() / 500);
 	//here, if the corresponding key is pressed, the image of a pressed key is shown
 	//this is referred to as the judgement line
 
 	for (let i = 0; i < 4; i++) {
 		translate(0, 0, -25);
-		foo.push(rect(x, 0, tSize / 4 + 10, tHeight + 2000));
-
+		foo.push(rect(x, 0, tSize / 4 + 45, tHeight + 2000));
 		translate(0, 0, 25);
 		translate(0, 0, -5);
 		bar.push(x);
@@ -134,7 +136,9 @@ function draw() {
 				case 'slider':
 					image(note.image, note.x, note.y, note.w, note.h);
 					image(sliderMid, note.x, note.y - note.length / 2, note.w, note.length);
-					image(sliderTail, note.x, note.y - note.length, note.w, note.h);
+					image(note.tail.image, note.tail.x, note.tail.y, note.w, note.h);
+				//tailSlider(note.x, note.y, note.col, note.sliderId);
+				//image(sliderTail, note.x, note.y - note.length, note.w, note.h);
 				// if (note.length > 0) {
 				// 	note.midOffset -= width * 0.02 * 0.86;
 				// 	note.length -= 86;
@@ -143,23 +147,19 @@ function draw() {
 				// 	tailSlider(note.x, note.y + note.midOffset, note.col);
 				// }
 				// break;
-				case 'section':
-					image(note.image, note.x, note.y, note.w, note.h);
-					break;
 				case 'tail':
-					rotateZ(90);
 					image(note.image, note.x, note.y, note.w, note.h);
-					rotateZ(-90);
 			}
 		}
 		//and here removes them if they are past the judgement line
+		console.log(column);
 		for (let i = 0; i < column.length; i++) {
 			if (column[i].y >= 600) {
 				if (column[i].type === 'note' || column[i].type === 'tail') {
 					lates.push(column[i]);
 					column.splice(i, 1);
 				}
-				if (column[i].type === 'note' || column[i].type === 'slider') miss();
+				//if (column[i].type === 'note' || column[i].type === 'slider') miss();
 			}
 		}
 	}
@@ -171,6 +171,7 @@ function draw() {
 		for (let column of notemap)
 			for (let note of column) {
 				note.y += scrollSpeed.value();
+				if (note.type === 'slider') note.tail.y += scrollSpeed.value();
 				note.set;
 			}
 	}
@@ -221,7 +222,9 @@ function keyPressed() {
 			handleKeyPress(3);
 			break;
 		case 'v':
-			dropSlider();
+			newSlider();
+			// dropSlider();
+			sliderId++;
 	}
 }
 
@@ -281,31 +284,44 @@ function dropSlider() {
 		h: windowWidth * 0.02 * 1.88,
 		length: 500,
 		midOffset: 0,
-		col: column
+		col: column,
+		id: sliderId
 	};
 	notemap[column].push(slider);
 }
 
-function midSlider(xPos, yPos, column) {
-	section = {
-		type: 'section',
-		image: sliderMid,
-		x: xPos,
-		y: yPos,
+function newSlider() {
+	let column = Math.floor(random(0, 4));
+	let _length = 500;
+	slider = {
+		type: 'slider',
+		image: sliderTop,
+		x: lanePos[column],
+		y: -1400,
 		w: windowWidth * 0.02 * 2.56,
-		h: windowWidth * 0.02 * 0.82
+		h: windowWidth * 0.02 * 1.88,
+		length: _length,
+		midOffset: 0,
+		col: column,
+		id: sliderId,
+		tail: {
+			image: sliderTail,
+			x: lanePos[column],
+			y: -1400 - _length
+		}
 	};
-	notemap[column].push(section);
+	notemap[column].push(slider);
 }
 
-function tailSlider(xPos, yPos, column) {
+function tailSlider(xPos, yPos, column, sliderId) {
 	tail = {
 		type: 'tail',
 		image: sliderTail,
 		x: xPos,
 		y: yPos,
 		w: windowWidth * 0.02 * 2.56,
-		h: windowWidth * 0.02 * 1.88
+		h: windowWidth * 0.02 * 1.88,
+		id: sliderId
 	};
-	notemap[column].push(section);
+	notemap[column].push(tail);
 }
