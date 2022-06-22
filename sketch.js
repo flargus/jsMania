@@ -5,6 +5,7 @@ let keyImg;
 let noteImg;
 let sliderTop;
 let sliderMid;
+let sliderTail;
 function preload() {
 	keyImg = loadImage('assets/key.png');
 	keyPress = loadImage('assets/keyPressed.png');
@@ -13,6 +14,7 @@ function preload() {
 	hitSound = loadSound('assets/normal-hitnormal.ogg');
 	sliderTop = loadImage('assets/sliderTop.png');
 	sliderMid = loadImage('assets/sliderMid.png');
+	sliderTail = loadImage('assets/sliderTail.png');
 }
 
 function setup() {
@@ -131,7 +133,8 @@ function draw() {
 					break;
 				case 'slider':
 					image(note.image, note.x, note.y, note.w, note.h);
-					image(note.image, note.x, note.y - note.length, note.w, note.h);
+					image(sliderMid, note.x, note.y - note.length / 2, note.w, note.length);
+					image(sliderTail, note.x, note.y - note.length, note.w, note.h);
 				// if (note.length > 0) {
 				// 	note.midOffset -= width * 0.02 * 0.86;
 				// 	note.length -= 86;
@@ -152,9 +155,11 @@ function draw() {
 		//and here removes them if they are past the judgement line
 		for (let i = 0; i < column.length; i++) {
 			if (column[i].y >= 600) {
-				lates.push(column[i]);
-				column.splice(i, 1);
-				miss();
+				if (column[i].type === 'note' || column[i].type === 'tail') {
+					lates.push(column[i]);
+					column.splice(i, 1);
+				}
+				if (column[i].type === 'note' || column[i].type === 'slider') miss();
 			}
 		}
 	}
@@ -171,7 +176,7 @@ function draw() {
 	}
 	if (millis() >= nDesnsity.value() + timer) {
 		fps = frameRate();
-		dropCircle();
+		//dropCircle();
 		timer = millis();
 	}
 	if (lates.length > 30) {
@@ -296,7 +301,7 @@ function midSlider(xPos, yPos, column) {
 function tailSlider(xPos, yPos, column) {
 	tail = {
 		type: 'tail',
-		image: sliderTop,
+		image: sliderTail,
 		x: xPos,
 		y: yPos,
 		w: windowWidth * 0.02 * 2.56,
