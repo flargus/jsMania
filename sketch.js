@@ -42,11 +42,11 @@ let hits = 0;
 let combo = 0;
 let misses = 0;
 let ttHeight;
+let rotateFrame = false;
 
 function draw() {
 	//resize canvas on every update, in case of window size change
 	resizeCanvas(windowWidth, windowHeight);
-	translate(0, 0);
 	let fps = frameRate();
 	let foo = [];
 	let bar = [];
@@ -76,9 +76,11 @@ function draw() {
 	rotateX(1.25);
 	//here, if the corresponding key is pressed, the image of a pressed key is shown
 	//this is referred to as the judgement line
+
 	for (let i = 0; i < 4; i++) {
 		translate(0, 0, -25);
 		foo.push(rect(x, 0, tSize / 4 + 10, tHeight + 2000));
+
 		translate(0, 0, 25);
 		translate(0, 0, -5);
 		bar.push(x);
@@ -92,9 +94,10 @@ function draw() {
 		fill(0, 0, 0);
 		translate(0, 0, 5);
 	}
-
+	translate(0, 0, 5);
 	for (let i = 0; i < 4; i++) {
 		if (keys[i]) {
+			rotateFrame = true;
 			switch (i) {
 				case 0:
 					rotateY(-0.02);
@@ -122,7 +125,28 @@ function draw() {
 		//draw all notes
 		for (let note of column) {
 			fill(0, 255, 255);
-			image(note.image, note.x, note.y, note.w, note.h);
+			switch (note.type) {
+				case 'note':
+					image(note.image, note.x, note.y, note.w, note.h);
+					break;
+				case 'slider':
+					image(note.image, note.x, note.y, note.w, note.h);
+					if (note.length > 0) {
+						note.midOffset -= width * 0.02 * 0.86;
+						note.length -= 86;
+						midSlider(note.x, note.y + note.midOffset, note.col);
+					} else {
+						tailSlider(note.x, note.y + note.midOffset, note.col);
+					}
+					break;
+				case 'section':
+					image(note.image, note.x, note.y, note.w, note.h);
+					break;
+				case 'tail':
+					rotateY(1);
+					image(note.image, note.x, note.y, note.w, note.h);
+					rotateY(-1);
+			}
 		}
 		//and here removes them if they are past the judgement line
 		for (let i = 0; i < column.length; i++) {
@@ -146,14 +170,16 @@ function draw() {
 	}
 	if (millis() >= nDesnsity.value() + timer) {
 		fps = frameRate();
-		dropCircle();
+		//dropCircle();
 		timer = millis();
+	}
+	if (lates.length > 30) {
+		lates.pop();
 	}
 	translate(0, 0 - 20);
 	lanes = foo;
 	lanePos = bar;
 	jCircle = vs;
-
 	x = -tSize / 4 - tSize / 8;
 	translate(0, 0, -20);
 	//this will draw the keys at the bottom
@@ -175,10 +201,22 @@ function miss() {
 }
 
 function keyPressed() {
-	if (key === 'd') handleKeyPress(0);
-	if (key === 'f') handleKeyPress(1);
-	if (key === 'j') handleKeyPress(2);
-	if (key === 'k') handleKeyPress(3);
+	switch (key) {
+		case 'd':
+			handleKeyPress(0);
+			break;
+		case 'f':
+			handleKeyPress(1);
+			break;
+		case 'j':
+			handleKeyPress(2);
+			break;
+		case 'k':
+			handleKeyPress(3);
+			break;
+		case 'v':
+			dropSlider();
+	}
 }
 
 function handleKeyPress(key) {
@@ -195,16 +233,27 @@ function handleKeyPress(key) {
 }
 
 function keyReleased() {
-	if (key === 'd') keys[0] = false;
-	if (key === 'f') keys[1] = false;
-	if (key === 'j') keys[2] = false;
-	if (key === 'k') keys[3] = false;
+	switch (key) {
+		case 'd':
+			keys[0] = false;
+			break;
+		case 'f':
+			keys[1] = false;
+			break;
+		case 'j':
+			keys[2] = false;
+			break;
+		case 'k':
+			keys[3] = false;
+			break;
+	}
 }
 
 function dropCircle() {
 	let column = Math.floor(random(0, 4));
 	//define the position of the note, this is added to the notemap and subsequently used in draw()
 	note = {
+		type: 'note',
 		image: column === 1 || column === 2 ? note2 : note1,
 		x: lanePos[column],
 		y: -1400,
@@ -213,4 +262,44 @@ function dropCircle() {
 		color: (0, 225, 255)
 	};
 	notemap[column].push(note);
+}
+
+function dropSlider() {
+	let column = Math.floor(random(0.4));
+	slider = {
+		type: 'slider',
+		image: sliderTop,
+		x: lanePos[column],
+		y: -1400,
+		w: windowWidth * 0.02 * 2.56,
+		h: windowWidth * 0.02 * 1.88,
+		length: 500,
+		midOffset: 0,
+		col: column
+	};
+	notemap[column].push(slider);
+}
+
+function midSlider(xPos, yPos, column) {
+	section = {
+		type: 'section',
+		image: sliderMid,
+		x: xPos,
+		y: yPos,
+		w: windowWidth * 0.02 * 2.56,
+		h: windowWidth * 0.02 * 0.82
+	};
+	notemap[column].push(section);
+}
+
+function tailSlider(xPos, yPos, column) {
+	tail = {
+		type: 'tail',
+		image: sliderTop,
+		x: xPos,
+		y: yPos,
+		w: windowWidth * 0.02 * 2.56,
+		h: windowWidth * 0.02 * 1.88
+	};
+	notemap[column].push(section);
 }
