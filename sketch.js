@@ -6,6 +6,7 @@ let noteImg;
 let sliderTop;
 let sliderMid;
 let sliderTail;
+let wallTexture;
 function preload() {
 	keyImg = loadImage('assets/key.png');
 	keyPress = loadImage('assets/keyPressed.png');
@@ -15,6 +16,7 @@ function preload() {
 	sliderTop = loadImage('assets/sliderTop.png');
 	sliderMid = loadImage('assets/sliderMid.png');
 	sliderTail = loadImage('assets/sliderTail.png');
+	wallTexture = loadImage('assets/wallTexture.png');
 }
 
 function setup() {
@@ -27,14 +29,15 @@ function setup() {
 	let font = loadFont('/assets/futuraBook.otf');
 	textFont(font);
 	noteImgs = [note1, note2];
+	wallTexture.resize(1024, 1024);
 }
 
 let lates = [];
 let lanes = [];
 let lanePos = [];
 let timer = 0;
-let notes = [];
 let notemap = [[], [], [], []];
+let canHit = [[], [], [], []];
 let jCircle = [];
 let kp = [false, false, false, false];
 let tColor = (255, 0, 255);
@@ -48,6 +51,10 @@ let rotateFrame = false;
 let sliderId = 0;
 
 function draw() {
+	console.log(wallTexture.width);
+	console.log(wallTexture.height);
+	wallTexture.width = 1024;
+	wallTexture.height = 1024;
 	//resize canvas on every update, in case of window size change
 	resizeCanvas(windowWidth, windowHeight);
 	let fps = frameRate();
@@ -74,9 +81,11 @@ function draw() {
 	text('hits:' + hits, -950, -175);
 	text(combo, 0, -300);
 	text('miss:' + misses, -950, -125);
-	fill(0);
+	fill(100);
 	strokeWeight(0);
 	rotateX(1.25);
+
+	fill(0);
 	// rotateZ(millis() / 500);
 	// rotateY(millis() / 500);
 	//here, if the corresponding key is pressed, the image of a pressed key is shown
@@ -143,6 +152,7 @@ function draw() {
 		for (let i = 0; i < column.length; i++) {
 			if (column[i].y >= 600 && column[i].type === 'note') {
 				lates.push(column[i]);
+				// canHit.splice(i, 1);
 				column.splice(i, 1);
 				miss();
 			} else if (column[i].type === 'slider') {
@@ -158,20 +168,24 @@ function draw() {
 	translate(0, 0, -5);
 	//this will spawn a note every *note density value*
 	translate(0, 0, 20);
-	if (millis() >= 1 + timer) {
+	if (millis() >= scrollSpeed.value() + timer) {
 		for (let column of notemap)
 			for (let note of column) {
 				note.y += scrollSpeed.value();
+				note.jDist -= scrollSpeed.value();
 				if (note.type === 'slider') {
 					note.tail.y += scrollSpeed.value();
 					note.mid.y += scrollSpeed.value();
 				}
-				note.set;
+
+				if (note.jDist < 200 && canHit[notemap.indexOf(column)].length === 0) {
+					canHit[notemap.indexOf(column)].push(note);
+				}
 			}
 	}
 	if (millis() >= nDesnsity.value() + timer) {
 		fps = frameRate();
-		//dropCircle();
+		dropCircle();
 		timer = millis();
 		for (let column of notemap) {
 			for (let note of column) {
@@ -198,9 +212,17 @@ function draw() {
 		x += tSize / 4;
 	}
 	translate(0, 0, 20);
+	fill(100);
+	imageMode(CORNER);
+	push();
+	texture(wallTexture);
+	textureWrap(REPEAT);
+	wallTexture.resize(1024, 1024);
+	rotateY(millis() / 1000);
+	cylinder(512, 5000, 24, 16, false, false);
 	rotateX(-1.25);
-
-
+	translate(-2000, 0, -3000);
+	pop();
 }
 function hit(distance) {
 	combo++;
@@ -252,22 +274,28 @@ function keyReleased() {
 function handleKeyPress(key) {
 	keys[key] = true;
 	let column = notemap[key];
-	for (let i = 0; i < column.length; i++) {
-		let dist = 400 - column[i].y;
-		if (dist < 200) {
-			if (column[i].type === 'note') {
-				hitSound.play();
-				hit(dist);
-				column.splice(i, 1);
-			}
-			else if (column[i].type === 'slider') {
-				console.log('here')
-				column[i].active = true;
-				hitSound.play();
-				hit(dist);
-			}
-		}
+	if (canHit[key].length > 0) {
+		hitSound.play();
+		hit(dist);
+		column.splice(0, 1);
+		notemap[column].splice(0, 1);
 	}
+
+	// for (let i = 0; i < column.length; i++) {
+	// 	let dist = 400 - column[i].y;
+	// 	if (dist < 200) {
+	// 		if (column[i].type === 'note') {
+	// 			hitSound.play();
+	// 			hit(dist);
+	// 			column.splice(i, 1);
+	// 		} else if (column[i].type === 'slider') {
+	// 			console.log('here');
+	// 			column[i].active = true;
+	// 			hitSound.play();
+	// 			hit(dist);
+	// 		}
+	// 	}
+	// }
 }
 
 function handleKeyRelease(key) {
@@ -278,7 +306,6 @@ function handleKeyRelease(key) {
 		if (column[i].type === 'slider') dist = 400 - column[i].tail.y;
 		if (dist < 400 && column[i].active) {
 			hit(dist);
-			column[i].active = false;
 			column.splice(i, 1);
 			hitSound.play();
 		}
@@ -295,11 +322,11 @@ function dropCircle() {
 		y: -1400,
 		w: windowWidth * 0.02 * 2.56,
 		h: windowWidth * 0.02 * 1.88,
+		jDist: 1400,
 		color: (0, 225, 255)
 	};
 	notemap[column].push(note);
 }
-
 
 function newSlider(_length = random(0, 10) * 100) {
 	let column = Math.floor(random(0, 4));
@@ -324,4 +351,3 @@ function newSlider(_length = random(0, 10) * 100) {
 	};
 	notemap[column].push(slider);
 }
-
