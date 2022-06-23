@@ -168,7 +168,7 @@ function draw() {
 	}
 	if (millis() >= nDesnsity.value() + timer) {
 		fps = frameRate();
-		dropCircle();
+		//dropCircle();
 		timer = millis();
 	}
 	if (lates.length > 30) {
@@ -294,9 +294,9 @@ function dropSlider() {
 	notemap[column].push(slider);
 }
 
-function newSlider() {
+function newSlider(_length = random(0, 10) * 100) {
 	let column = Math.floor(random(0, 4));
-	let _length = 500;
+	// let _length = random(0, 10) * 100;
 	slider = {
 		type: 'slider',
 		image: sliderTop,
