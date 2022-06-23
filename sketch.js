@@ -135,8 +135,8 @@ function draw() {
 					break;
 				case 'slider':
 					image(note.image, note.x, note.y, note.w, note.h);
-					image(sliderMid, note.x, note.y - note.length / 2, note.w, note.length);
-					image(note.tail.image, note.tail.x, note.tail.y, note.w, note.h);
+					image(note.mid.image, note.x, note.mid.y, note.w, note.length);
+					image(note.tail.image, note.x, note.tail.y, note.w, note.h);
 			}
 		}
 		//and here removes them if they are past the judgement line
@@ -162,7 +162,10 @@ function draw() {
 		for (let column of notemap)
 			for (let note of column) {
 				note.y += scrollSpeed.value();
-				if (note.type === 'slider') note.tail.y += scrollSpeed.value();
+				if (note.type === 'slider') {
+					note.tail.y += scrollSpeed.value();
+					note.mid.y += scrollSpeed.value();
+				}
 				note.set;
 			}
 	}
@@ -230,36 +233,42 @@ function keyPressed() {
 	}
 }
 
+function keyReleased() {
+	switch (key) {
+		case 'd':
+			handleKeyRelease(0);
+			break;
+		case 'f':
+			handleKeyRelease(1);
+			break;
+		case 'j':
+			handleKeyRelease(2);
+			break;
+		case 'k':
+			handleKeyRelease(3);
+			break;
+	}
+}
+
 function handleKeyPress(key) {
 	keys[key] = true;
 	let column = notemap[key];
-	for (let column of notemap) {
-		for (let i = 0; i < column.length; i++) {
-			let dist = 400 - column[i].y;
-			if (dist < 100) {
-				hitSound.play();
-				hit(dist);
-				column.splice(i, 1);
-			}
+	for (let i = 0; i < column.length; i++) {
+		let dist = 400 - column[i].y;
+		if (dist < 200) {
+			if (column[i].type === 'note') hitSound.play();
+			hit(dist);
+			column.splice(i, 1);
+		} else if (column[i].type === 'slider') {
+			column[key].active = true;
+			hitSound.play();
+			hit(dist);
 		}
 	}
 }
 
-function keyReleased() {
-	switch (key) {
-		case 'd':
-			keys[0] = false;
-			break;
-		case 'f':
-			keys[1] = false;
-			break;
-		case 'j':
-			keys[2] = false;
-			break;
-		case 'k':
-			keys[3] = false;
-			break;
-	}
+function handleKeyRelease(key) {
+	keys[key] = false;
 }
 
 function dropCircle() {
@@ -277,22 +286,22 @@ function dropCircle() {
 	notemap[column].push(note);
 }
 
-function dropSlider() {
-	let column = Math.floor(random(0, 4));
-	slider = {
-		type: 'slider',
-		image: sliderTop,
-		x: lanePos[column],
-		y: -1400,
-		w: windowWidth * 0.02 * 2.56,
-		h: windowWidth * 0.02 * 1.88,
-		length: 500,
-		midOffset: 0,
-		col: column,
-		id: sliderId
-	};
-	notemap[column].push(slider);
-}
+// function dropSlider() {
+// 	let column = Math.floor(random(0, 4));
+// 	slider = {
+// 		type: 'slider',
+// 		image: sliderTop,
+// 		x: lanePos[column],
+// 		y: -1400,
+// 		w: windowWidth * 0.02 * 2.56,
+// 		h: windowWidth * 0.02 * 1.88,
+// 		length: 500,
+// 		midOffset: 0,
+// 		col: column,
+// 		id: sliderId
+// 	};
+// 	notemap[column].push(slider);
+// }
 
 function newSlider(_length = random(0, 10) * 100) {
 	let column = Math.floor(random(0, 4));
@@ -305,28 +314,28 @@ function newSlider(_length = random(0, 10) * 100) {
 		w: windowWidth * 0.02 * 2.56,
 		h: windowWidth * 0.02 * 1.88,
 		length: _length,
-		midOffset: 0,
-		col: column,
-		id: sliderId,
 		active: false,
+		mid: {
+			image: sliderMid,
+			y: -1400 - _length / 2
+		},
 		tail: {
 			image: sliderTail,
-			x: lanePos[column],
 			y: -1400 - _length
 		}
 	};
 	notemap[column].push(slider);
 }
 
-function tailSlider(xPos, yPos, column, sliderId) {
-	tail = {
-		type: 'tail',
-		image: sliderTail,
-		x: xPos,
-		y: yPos,
-		w: windowWidth * 0.02 * 2.56,
-		h: windowWidth * 0.02 * 1.88,
-		id: sliderId
-	};
-	notemap[column].push(tail);
-}
+// function tailSlider(xPos, yPos, column, sliderId) {
+// 	tail = {
+// 		type: 'tail',
+// 		image: sliderTail,
+// 		x: xPos,
+// 		y: yPos,
+// 		w: windowWidth * 0.02 * 2.56,
+// 		h: windowWidth * 0.02 * 1.88,
+// 		id: sliderId
+// 	};
+// 	notemap[column].push(tail);
+// }
