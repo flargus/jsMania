@@ -137,29 +137,20 @@ function draw() {
 					image(note.image, note.x, note.y, note.w, note.h);
 					image(sliderMid, note.x, note.y - note.length / 2, note.w, note.length);
 					image(note.tail.image, note.tail.x, note.tail.y, note.w, note.h);
-				//tailSlider(note.x, note.y, note.col, note.sliderId);
-				//image(sliderTail, note.x, note.y - note.length, note.w, note.h);
-				// if (note.length > 0) {
-				// 	note.midOffset -= width * 0.02 * 0.86;
-				// 	note.length -= 86;
-				// 	midSlider(note.x, note.y + note.midOffset, note.col);
-				// } else {
-				// 	tailSlider(note.x, note.y + note.midOffset, note.col);
-				// }
-				// break;
-				case 'tail':
-					image(note.image, note.x, note.y, note.w, note.h);
 			}
 		}
 		//and here removes them if they are past the judgement line
-		console.log(column);
 		for (let i = 0; i < column.length; i++) {
-			if (column[i].y >= 600) {
-				if (column[i].type === 'note' || column[i].type === 'tail') {
+			if (column[i].y >= 600 && column[i].type === 'note') {
+				lates.push(column[i]);
+				column.splice(i, 1);
+				miss();
+			} else if (column[i].type === 'slider') {
+				if (column[i].tail.y > 600) {
 					lates.push(column[i]);
 					column.splice(i, 1);
+					miss();
 				}
-				//if (column[i].type === 'note' || column[i].type === 'slider') miss();
 			}
 		}
 	}
@@ -177,7 +168,7 @@ function draw() {
 	}
 	if (millis() >= nDesnsity.value() + timer) {
 		fps = frameRate();
-		//dropCircle();
+		dropCircle();
 		timer = millis();
 	}
 	if (lates.length > 30) {
@@ -196,6 +187,17 @@ function draw() {
 	}
 	translate(0, 0, 20);
 	rotateX(-1.25);
+
+	// for (let column of notemap) {
+	// 	for (let i = 0; i < column.length; i++) {
+	// 		let dist = 400 - column[i].y;
+	// 		if (dist < 100) {
+	// 			hitSound.play();
+	// 			hit(dist);
+	// 			column.splice(i, 1);
+	// 		}
+	// 	}
+	// }
 }
 function hit(distance) {
 	combo++;
@@ -231,12 +233,14 @@ function keyPressed() {
 function handleKeyPress(key) {
 	keys[key] = true;
 	let column = notemap[key];
-	for (let i = 0; i < column.length; i++) {
-		let dist = 400 - column[i].y;
-		if (dist < 100) {
-			hitSound.play();
-			hit(dist);
-			column.splice(i, 1);
+	for (let column of notemap) {
+		for (let i = 0; i < column.length; i++) {
+			let dist = 400 - column[i].y;
+			if (dist < 100) {
+				hitSound.play();
+				hit(dist);
+				column.splice(i, 1);
+			}
 		}
 	}
 }
@@ -304,6 +308,7 @@ function newSlider() {
 		midOffset: 0,
 		col: column,
 		id: sliderId,
+		active: false,
 		tail: {
 			image: sliderTail,
 			x: lanePos[column],
