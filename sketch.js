@@ -173,6 +173,15 @@ function draw() {
 		fps = frameRate();
 		//dropCircle();
 		timer = millis();
+		for (let column of notemap) {
+			for (let note of column) {
+				if (note.type === 'slider') {
+					if (note.active) {
+						combo++;
+					}
+				}
+			}
+		}
 	}
 	if (lates.length > 30) {
 		lates.pop();
@@ -191,16 +200,7 @@ function draw() {
 	translate(0, 0, 20);
 	rotateX(-1.25);
 
-	// for (let column of notemap) {
-	// 	for (let i = 0; i < column.length; i++) {
-	// 		let dist = 400 - column[i].y;
-	// 		if (dist < 100) {
-	// 			hitSound.play();
-	// 			hit(dist);
-	// 			column.splice(i, 1);
-	// 		}
-	// 	}
-	// }
+
 }
 function hit(distance) {
 	combo++;
@@ -228,7 +228,6 @@ function keyPressed() {
 			break;
 		case 'v':
 			newSlider();
-			// dropSlider();
 			sliderId++;
 	}
 }
@@ -256,19 +255,34 @@ function handleKeyPress(key) {
 	for (let i = 0; i < column.length; i++) {
 		let dist = 400 - column[i].y;
 		if (dist < 200) {
-			if (column[i].type === 'note') hitSound.play();
-			hit(dist);
-			column.splice(i, 1);
-		} else if (column[i].type === 'slider') {
-			column[key].active = true;
-			hitSound.play();
-			hit(dist);
+			if (column[i].type === 'note') {
+				hitSound.play();
+				hit(dist);
+				column.splice(i, 1);
+			}
+			else if (column[i].type === 'slider') {
+				console.log('here')
+				column[i].active = true;
+				hitSound.play();
+				hit(dist);
+			}
 		}
 	}
 }
 
 function handleKeyRelease(key) {
 	keys[key] = false;
+	let column = notemap[key];
+	for (let i = 0; i < column.length; i++) {
+		let dist;
+		if (column[i].type === 'slider') dist = 400 - column[i].tail.y;
+		if (dist < 400 && column[i].active) {
+			hit(dist);
+			column[i].active = false;
+			column.splice(i, 1);
+			hitSound.play();
+		}
+	}
 }
 
 function dropCircle() {
@@ -286,22 +300,6 @@ function dropCircle() {
 	notemap[column].push(note);
 }
 
-// function dropSlider() {
-// 	let column = Math.floor(random(0, 4));
-// 	slider = {
-// 		type: 'slider',
-// 		image: sliderTop,
-// 		x: lanePos[column],
-// 		y: -1400,
-// 		w: windowWidth * 0.02 * 2.56,
-// 		h: windowWidth * 0.02 * 1.88,
-// 		length: 500,
-// 		midOffset: 0,
-// 		col: column,
-// 		id: sliderId
-// 	};
-// 	notemap[column].push(slider);
-// }
 
 function newSlider(_length = random(0, 10) * 100) {
 	let column = Math.floor(random(0, 4));
@@ -327,15 +325,3 @@ function newSlider(_length = random(0, 10) * 100) {
 	notemap[column].push(slider);
 }
 
-// function tailSlider(xPos, yPos, column, sliderId) {
-// 	tail = {
-// 		type: 'tail',
-// 		image: sliderTail,
-// 		x: xPos,
-// 		y: yPos,
-// 		w: windowWidth * 0.02 * 2.56,
-// 		h: windowWidth * 0.02 * 1.88,
-// 		id: sliderId
-// 	};
-// 	notemap[column].push(tail);
-// }
