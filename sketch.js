@@ -6,6 +6,7 @@ let noteImg;
 let sliderTop;
 let sliderMid;
 let sliderTail;
+let wallTunnel;
 function preload() {
 	keyImg = loadImage('assets/key.png');
 	keyPress = loadImage('assets/keyPressed.png');
@@ -15,10 +16,11 @@ function preload() {
 	sliderTop = loadImage('assets/sliderTop.png');
 	sliderMid = loadImage('assets/sliderMid.png');
 	sliderTail = loadImage('assets/sliderTail.png');
+	wallTunnel = loadImage('assets/rockies128.jpg');
 }
 
 function setup() {
-	createCanvas(windowWidth, windowHeight, WEBGL);
+	createCanvas(128, 128, WEBGL);
 	nDesnsity = createSlider(200, 1000);
 	nDesnsity.position(0, 0);
 	scrollSpeed = createSlider(1, 12);
@@ -27,6 +29,7 @@ function setup() {
 	let font = loadFont('/assets/futuraBook.otf');
 	textFont(font);
 	noteImgs = [note1, note2];
+	textureWrap(REPEAT)
 }
 
 let lates = [];
@@ -77,6 +80,7 @@ function draw() {
 	fill(0);
 	strokeWeight(0);
 	rotateX(1.25);
+
 	// rotateZ(millis() / 500);
 	// rotateY(millis() / 500);
 	//here, if the corresponding key is pressed, the image of a pressed key is shown
@@ -171,7 +175,7 @@ function draw() {
 	}
 	if (millis() >= nDesnsity.value() + timer) {
 		fps = frameRate();
-		//dropCircle();
+		dropCircle();
 		timer = millis();
 		for (let column of notemap) {
 			for (let note of column) {
@@ -198,9 +202,11 @@ function draw() {
 		x += tSize / 4;
 	}
 	translate(0, 0, 20);
-	rotateX(-1.25);
-
-
+	wallTunnel.resize(128,128)
+	texture(wallTunnel);
+	rotateY(millis() / 1000);
+	cylinder(300, 5000, 24, 16, false, false);
+	
 }
 function hit(distance) {
 	combo++;
@@ -259,9 +265,8 @@ function handleKeyPress(key) {
 				hitSound.play();
 				hit(dist);
 				column.splice(i, 1);
-			}
-			else if (column[i].type === 'slider') {
-				console.log('here')
+			} else if (column[i].type === 'slider') {
+				console.log('here');
 				column[i].active = true;
 				hitSound.play();
 				hit(dist);
@@ -300,7 +305,6 @@ function dropCircle() {
 	notemap[column].push(note);
 }
 
-
 function newSlider(_length = random(0, 10) * 100) {
 	let column = Math.floor(random(0, 4));
 	// let _length = random(0, 10) * 100;
@@ -324,4 +328,3 @@ function newSlider(_length = random(0, 10) * 100) {
 	};
 	notemap[column].push(slider);
 }
-
