@@ -7,6 +7,16 @@ let sliderTop;
 let sliderMid;
 let sliderTail;
 let wallTexture;
+
+var rows = 7;
+var img;
+var res = 2048;
+var radius = 1000;
+var stripH = 2048;
+var ang;
+var sectionLength;
+var heightRatio;
+
 function preload() {
 	keyImg = loadImage('assets/key.png');
 	keyPress = loadImage('assets/keyPressed.png');
@@ -16,9 +26,10 @@ function preload() {
 	sliderTop = loadImage('assets/sliderTop.png');
 	sliderMid = loadImage('assets/sliderMid.png');
 	sliderTail = loadImage('assets/sliderTail.png');
-	wallTexture = loadImage('assets/wallTexture.png');
+	img = loadImage('assets/wallTexture.png');
 }
 
+let graphics;
 function setup() {
 	createCanvas(windowWidth, windowHeight, WEBGL);
 	nDesnsity = createSlider(200, 1000);
@@ -29,7 +40,10 @@ function setup() {
 	let font = loadFont('/assets/futuraBook.otf');
 	textFont(font);
 	noteImgs = [note1, note2];
-	wallTexture.resize(1024, 1024);
+	graphics = createGraphics(0, 0);
+	graphics.rect(128 / 4, 0, 128, 10);
+	textureWrap(REPEAT);
+	image(img, 0, 0);
 }
 
 let lates = [];
@@ -51,10 +65,6 @@ let rotateFrame = false;
 let sliderId = 0;
 
 function draw() {
-	console.log(wallTexture.width);
-	console.log(wallTexture.height);
-	wallTexture.width = 1024;
-	wallTexture.height = 1024;
 	//resize canvas on every update, in case of window size change
 	resizeCanvas(windowWidth, windowHeight);
 	let fps = frameRate();
@@ -212,17 +222,39 @@ function draw() {
 		x += tSize / 4;
 	}
 	translate(0, 0, 20);
-	fill(100);
 	imageMode(CORNER);
+
 	push();
-	texture(wallTexture);
-	textureWrap(REPEAT);
-	wallTexture.resize(1024, 1024);
-	rotateY(millis() / 1000);
-	cylinder(512, 5000, 24, 16, false, false);
-	rotateX(-1.25);
-	translate(-2000, 0, -3000);
+	rotateY(millis() / 500);
+	heightRatio = (img.width * stripH) / img.height;
+	ang = (-2 * PI) / res;
+	sectionLength = (2 * PI * radius) / res;
+	imageMode(CORNER);
+	heightRatio = (img.width * stripH) / img.height;
+	ang = (-2 * PI) / res;
+	sectionLength = (2 * PI * radius) / res;
+	translate(0, (-(rows - 1) * stripH) / 2);
+	texture(img);
+	beginShape(TRIANGLE_STRIP);
+	for (var j = 0; j < rows; j++) {
+		beginShape(TRIANGLE_STRIP);
+		for (var i = 0; i <= res; i++) {
+			var x = cos(i * ang) * radius;
+			var z = sin(i * ang) * radius;
+			var y = j * stripH;
+			var yBottom = (j + 1) * stripH;
+
+			var u = map(i * sectionLength + j, 0, heightRatio, 0, 1);
+
+			vertex(x, y, z, u, 0);
+			vertex(x, yBottom, z, u, 1);
+		}
+		endShape();
+	}
 	pop();
+	texture(img);
+	translate(0, -4500, 0);
+	sphere(500);
 }
 function hit(distance) {
 	combo++;
