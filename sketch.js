@@ -84,13 +84,7 @@ function draw() {
 
 	fill(0, 0, 0);
 	x = -tSize / 4 - tSize / 8;
-	fill(255);
-	textSize(30);
-	text('FPS: ' + fps.toFixed(0), -950, -325);
-	text('secs: ' + (millis() / 1000).toFixed(0), -950, -200);
-	text('hits:' + hits, -950, -175);
-	text(combo, 0, -300);
-	text('miss:' + misses, -950, -125);
+
 	fill(100);
 	strokeWeight(0);
 	rotateX(1.25);
@@ -253,9 +247,17 @@ function draw() {
 		endShape();
 	}
 	pop();
-	texture(img);
+
 	push();
-	translate(0, -4500, 0);
+	translate(100, 100, 0);
+	rotateX(-1.25);
+	fill(255);
+	textSize(30);
+	text('FPS: ' + fps.toFixed(0), -950, -325);
+	text('secs: ' + (millis() / 1000).toFixed(0), -950, -200);
+	text('hits:' + hits, -950, -175);
+	text(combo, 0, -300);
+	text('miss:' + misses, -950, -125);
 
 	pop();
 }
