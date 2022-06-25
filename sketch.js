@@ -225,7 +225,7 @@ function draw() {
 	imageMode(CORNER);
 
 	push();
-	rotateY(millis() / 500);
+	rotateY(millis() / 2000);
 	heightRatio = (img.width * stripH) / img.height;
 	ang = (-2 * PI) / res;
 	sectionLength = (2 * PI * radius) / res;
@@ -253,8 +253,10 @@ function draw() {
 	}
 	pop();
 	texture(img);
+	push();
 	translate(0, -4500, 0);
 	sphere(500);
+	pop();
 }
 function hit(distance) {
 	combo++;
