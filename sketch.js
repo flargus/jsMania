@@ -74,7 +74,7 @@ function draw() {
 	let tHeight = windowHeight;
 	ttHeight = tHeight;
 	const tSize = windowWidth * 0.2;
-	background(25, 25, 25);
+	background(0);
 
 	lights();
 
@@ -94,7 +94,7 @@ function draw() {
 	// rotateY(millis() / 500);
 	//here, if the corresponding key is pressed, the image of a pressed key is shown
 	//this is referred to as the judgement line
-
+	push();
 	for (let i = 0; i < 4; i++) {
 		translate(0, 0, -25);
 		foo.push(rect(x, 0, tSize / 4 + 45, tHeight + 3500));
@@ -217,7 +217,7 @@ function draw() {
 	}
 	translate(0, 0, 20);
 	imageMode(CORNER);
-
+	pop();
 	push();
 
 	rotateY(millis() / 2000);
@@ -256,7 +256,7 @@ function draw() {
 	text('FPS: ' + fps.toFixed(0), -950, -325);
 	text('secs: ' + (millis() / 1000).toFixed(0), -950, -200);
 	text('hits:' + hits, -950, -175);
-	text(combo, 0, -300);
+	text(combo, -100, -300);
 	text('miss:' + misses, -950, -125);
 
 	pop();
