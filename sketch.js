@@ -8,11 +8,11 @@ let sliderMid;
 let sliderTail;
 let wallTexture;
 
-var rows = 7;
+var rows = 15;
 var img;
-var res = 2048;
-var radius = 1000;
-var stripH = 2048;
+var res = 8;
+var radius = 1024;
+var stripH = 1024;
 var ang;
 var sectionLength;
 var heightRatio;
@@ -103,7 +103,7 @@ function draw() {
 
 	for (let i = 0; i < 4; i++) {
 		translate(0, 0, -25);
-		foo.push(rect(x, 0, tSize / 4 + 45, tHeight + 2000));
+		foo.push(rect(x, 0, tSize / 4 + 45, tHeight + 3500));
 		translate(0, 0, 25);
 		translate(0, 0, -5);
 		bar.push(x);
@@ -225,6 +225,7 @@ function draw() {
 	imageMode(CORNER);
 
 	push();
+
 	rotateY(millis() / 2000);
 	heightRatio = (img.width * stripH) / img.height;
 	ang = (-2 * PI) / res;
@@ -255,7 +256,7 @@ function draw() {
 	texture(img);
 	push();
 	translate(0, -4500, 0);
-	sphere(500);
+
 	pop();
 }
 function hit(distance) {
