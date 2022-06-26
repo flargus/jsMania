@@ -17,6 +17,8 @@ var ang;
 var sectionLength;
 var heightRatio;
 var tunnelOffset = 0;
+var globalTint = 0;
+var addColor = true;
 
 function preload() {
 	keyImg = loadImage('assets/key.png');
@@ -91,6 +93,7 @@ function draw() {
 	rotateX(1.25);
 
 	fill(0);
+	lights();
 	// rotateZ(millis() / 500);
 	// rotateY(millis() / 500);
 	//here, if the corresponding key is pressed, the image of a pressed key is shown
@@ -234,6 +237,7 @@ function draw() {
 	translate(0, (-(rows - 1) * stripH) / 2);
 	texture(img);
 	beginShape(TRIANGLE_STRIP);
+
 	for (var j = 0; j < rows; j++) {
 		beginShape(TRIANGLE_STRIP);
 		for (var i = 0; i <= res; i++) {
