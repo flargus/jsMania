@@ -11,7 +11,7 @@ let wallTexture;
 var rows = 22;
 var img;
 var res = 8;
-var radius = 1500;
+var radius = 1000;
 var stripH = 1500;
 var ang;
 var sectionLength;
@@ -115,26 +115,28 @@ function draw() {
 		fill(0, 0, 0);
 		translate(0, 0, 5);
 	}
+	pop();
+	push();
 	translate(0, 0, 5);
-	for (let i = 0; i < 4; i++) {
-		if (keys[i]) {
-			rotateFrame = true;
-			switch (i) {
-				case 0:
-					rotateY(-0.02);
-					break;
-				case 1:
-					rotateY(-0.01);
-					break;
-				case 2:
-					rotateY(0.01);
-					break;
-				case 3:
-					rotateY(0.02);
-					break;
-			}
-		}
-	}
+	// for (let i = 0; i < 4; i++) {
+	// 	if (keys[i]) {
+	// 		rotateFrame = true;
+	// 		switch (i) {
+	// 			case 0:
+	// 				rotateY(-0.02);
+	// 				break;
+	// 			case 1:
+	// 				rotateY(-0.01);
+	// 				break;
+	// 			case 2:
+	// 				rotateY(0.01);
+	// 				break;
+	// 			case 3:
+	// 				rotateY(0.02);
+	// 				break;
+	// 		}
+	// 	}
+	// }
 	// translate(0, 0, 15);
 	// for (let judge of jCircle) image(judge);
 	// translate(0, 0, -15);
@@ -193,7 +195,7 @@ function draw() {
 	}
 	if (millis() >= nDesnsity.value() + timer) {
 		fps = frameRate();
-		dropCircle();
+		//dropCircle();
 		timer = millis();
 		for (let column of notemap) {
 			for (let note of column) {
@@ -225,7 +227,7 @@ function draw() {
 	push();
 	fill(0);
 	translate(0, tunnelOffset, -100);
-	rotateY(2);
+	rotateY(0.4);
 	//rotateY(millis() / 1000);
 	tunnelOffset = tunnelOffset > stripH ? 0 : tunnelOffset + scrollSpeed.value() * 2;
 	heightRatio = (img.width * stripH) / img.height;
@@ -262,7 +264,7 @@ function draw() {
 	text('FPS: ' + fps.toFixed(0), -950, -325);
 	text('secs: ' + (millis() / 1000).toFixed(0), -950, -200);
 	text('hits:' + hits, -950, -175);
-	text(combo, -100, -300);
+	text(combo, -110, -300);
 	text('miss:' + misses, -950, -125);
 
 	pop();
@@ -346,12 +348,15 @@ function handleKeyRelease(key) {
 	let column = notemap[key];
 	for (let i = 0; i < column.length; i++) {
 		let dist;
-		if (column[i].type === 'slider') dist = 400 - column[i].tail.y;
+		if (column[i].type === 'slider') {
+			dist = 400 - column[i].tail.y;
+		}
 		if (dist < 400 && column[i].active) {
 			hit(dist);
 			column.splice(i, 1);
 			hitSound.play();
 		}
+		column[i].active = false;
 	}
 }
 
