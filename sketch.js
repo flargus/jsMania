@@ -179,6 +179,7 @@ function draw() {
 	//this will spawn a note every *note density value*
 	translate(0, 0, 20);
 	if (millis() >= scrollSpeed.value() + timer) {
+		//timer = millis();
 		for (let column of notemap)
 			for (let note of column) {
 				note.y += scrollSpeed.value();
@@ -195,7 +196,7 @@ function draw() {
 	}
 	if (millis() >= nDesnsity.value() + timer) {
 		fps = frameRate();
-		//dropCircle();
+		dropCircle();
 		timer = millis();
 		for (let column of notemap) {
 			for (let note of column) {
@@ -247,7 +248,6 @@ function draw() {
 			var z = sin(i * ang) * radius;
 			var y = j * stripH;
 			var yBottom = (j + 1) * stripH;
-
 			var u = map(i * sectionLength + j, 0, heightRatio, 0, 1);
 			vertex(x, y, z, u, 0);
 			vertex(x, yBottom, z, u, 1);
@@ -256,7 +256,6 @@ function draw() {
 	}
 	pop();
 
-	push();
 	translate(100, 100, 0);
 	rotateX(-1.25);
 	fill(255);
@@ -267,6 +266,9 @@ function draw() {
 	text(combo, -110, -300);
 	text('miss:' + misses, -950, -125);
 
+	translate(0, 0, 400);
+	rotateX(1.25);
+	text(' D    F    J    K', -200, 170);
 	pop();
 }
 function hit(distance) {
