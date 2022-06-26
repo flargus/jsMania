@@ -8,11 +8,11 @@ let sliderMid;
 let sliderTail;
 let wallTexture;
 
-var rows = 19;
+var rows = 22;
 var img;
 var res = 8;
-var radius = 1024;
-var stripH = 1024;
+var radius = 1500;
+var stripH = 1500;
 var ang;
 var sectionLength;
 var heightRatio;
@@ -224,14 +224,13 @@ function draw() {
 	translate(0, tunnelOffset, -100);
 	rotateY(2);
 	//rotateY(millis() / 1000);
-	tunnelOffset = tunnelOffset === stripH ? 0 : tunnelOffset + 16;
+	tunnelOffset = tunnelOffset > stripH ? 0 : tunnelOffset + scrollSpeed.value() * 2;
 	heightRatio = (img.width * stripH) / img.height;
 	ang = (-2 * PI) / res;
-	sectionLength = (2 * PI * radius) / res;
 	imageMode(CORNER);
 	heightRatio = (img.width * stripH) / img.height;
 	ang = (-2 * PI) / res;
-	sectionLength = (2 * PI * radius) / res;
+	sectionLength = 1500;
 	translate(0, (-(rows - 1) * stripH) / 2);
 	texture(img);
 	beginShape(TRIANGLE_STRIP);
@@ -244,7 +243,6 @@ function draw() {
 			var yBottom = (j + 1) * stripH;
 
 			var u = map(i * sectionLength + j, 0, heightRatio, 0, 1);
-
 			vertex(x, y, z, u, 0);
 			vertex(x, yBottom, z, u, 1);
 		}
