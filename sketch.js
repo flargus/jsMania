@@ -8,7 +8,7 @@ let sliderMid;
 let sliderTail;
 let wallTexture;
 
-var rows = 15;
+var rows = 19;
 var img;
 var res = 8;
 var radius = 1024;
@@ -16,6 +16,7 @@ var stripH = 1024;
 var ang;
 var sectionLength;
 var heightRatio;
+var tunnelOffset = 0;
 
 function preload() {
 	keyImg = loadImage('assets/key.png');
@@ -219,8 +220,11 @@ function draw() {
 	imageMode(CORNER);
 	pop();
 	push();
-
-	rotateY(millis() / 2000);
+	fill(0);
+	translate(0, tunnelOffset, -100);
+	rotateY(2);
+	//rotateY(millis() / 1000);
+	tunnelOffset = tunnelOffset === stripH ? 0 : tunnelOffset + 16;
 	heightRatio = (img.width * stripH) / img.height;
 	ang = (-2 * PI) / res;
 	sectionLength = (2 * PI * radius) / res;
