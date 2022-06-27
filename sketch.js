@@ -75,9 +75,12 @@ let lastSpawn = 0;
 let delta = 0;
 let distance = 1000;
 let HitObjects = [];
+let noteIndex = 0;
 
 let songName = 'oshamaScramble';
 let song = [];
+
+var mapNotes = [];
 
 function draw() {
 	//resize canvas on every update, in case of window size change
@@ -158,30 +161,32 @@ function draw() {
 	rotateX(-0.025);
 	for (let column of notemap) {
 		//draw all notes
-		for (let note of column) {
-			fill(0, 255, 255);
-			switch (note.type) {
-				case 'note':
-					image(note.image, note.x, note.y, note.w, note.h);
-					break;
-				case 'slider':
-					image(note.image, note.x, note.y, note.w, note.h);
-					image(note.mid.image, note.x, note.mid.y, note.w, note.length);
-					image(note.tail.image, note.x, note.tail.y, note.w, note.h);
+		if (column.length > 0) {
+			for (let note of column) {
+				fill(0, 255, 255);
+				switch (note.type) {
+					case 'note':
+						image(note.image, note.x, note.y, note.w, note.h);
+						break;
+					case 'slider':
+						image(note.image, note.x, note.y, note.w, note.h);
+						image(note.mid.image, note.x, note.mid.y, note.w, note.length);
+						image(note.tail.image, note.x, note.tail.y, note.w, note.h);
+				}
 			}
-		}
-		//and here removes them if they are past the judgement line
-		for (let i = 0; i < column.length; i++) {
-			if (column[i].y >= 600 && column[i].type === 'note') {
-				lates.push(column[i]);
-				// canHit.splice(i, 1);
-				column.splice(i, 1);
-				miss();
-			} else if (column[i].type === 'slider') {
-				if (column[i].tail.y > 600) {
+			//and here removes them if they are past the judgement line
+			for (let i = 0; i < column.length; i++) {
+				if (column[i].y >= 600 && column[i].type === 'note') {
 					lates.push(column[i]);
+					// canHit.splice(i, 1);
 					column.splice(i, 1);
 					miss();
+				} else if (column[i].type === 'slider') {
+					if (column[i].tail.y > 600) {
+						lates.push(column[i]);
+						column.splice(i, 1);
+						miss();
+					}
 				}
 			}
 		}
@@ -190,6 +195,13 @@ function draw() {
 	translate(0, 0, -5);
 	//this will spawn a note every *note density value*
 	translate(0, 0, 20);
+	console.log(mapNotes[noteIndex]);
+	if (millis() >= mapNotes[noteIndex].dropTime) {
+		console.log('here');
+		notemap.push(mapNotes[noteIndex]);
+		mapNotes.splice(noteIndex);
+		noteIndex++;
+	}
 
 	if (lates.length > 30) {
 		lates.pop();
@@ -237,7 +249,6 @@ function draw() {
 		endShape();
 	}
 	pop();
-
 	logic();
 
 	translate(100, 100, 0);
@@ -266,32 +277,34 @@ function draw() {
 
 function logic() {
 	for (let column of notemap)
-		for (let note of column) {
-			note.y += scrollSpeed.value() * delta;
-			note.jDist -= scrollSpeed.value() * delta;
-			if (note.type === 'slider') {
-				note.tail.y += scrollSpeed.value() * delta;
-				note.mid.y += scrollSpeed.value() * delta;
-			}
-
-			if (note.jDist < 200 && canHit[notemap.indexOf(column)].length === 0) {
-				canHit[notemap.indexOf(column)].push(note);
-			}
-		}
-	if (millis() >= nDesnsity.value() + lastSpawn) {
-		fps = frameRate();
-		dropCircle();
-		lastSpawn = millis();
-		for (let column of notemap) {
+		if (column.length > 0) {
 			for (let note of column) {
+				note.y += scrollSpeed.value() * delta;
+				note.jDist -= scrollSpeed.value() * delta;
 				if (note.type === 'slider') {
-					if (note.active) {
-						combo++;
+					note.tail.y += scrollSpeed.value() * delta;
+					note.mid.y += scrollSpeed.value() * delta;
+				}
+
+				if (note.jDist < 200 && canHit[notemap.indexOf(column)].length === 0) {
+					canHit[notemap.indexOf(column)].push(note);
+				}
+			}
+			if (millis() >= nDesnsity.value() + lastSpawn) {
+				fps = frameRate();
+				//dropCircle();
+				lastSpawn = millis();
+				for (let column of notemap) {
+					for (let note of column) {
+						if (note.type === 'slider') {
+							if (note.active) {
+								combo++;
+							}
+						}
 					}
 				}
 			}
 		}
-	}
 }
 
 function hit(distance) {
@@ -414,10 +427,47 @@ function dropCircle() {
 	notemap[column].push(note);
 }
 
+function newNote(column, time, isSlider = false, duration = 50) {
+	if (!isSlider) {
+		note = {
+			type: 'note',
+			image: column === 1 || column === 2 ? note2 : note1,
+			x: lanePos[column],
+			y: -1400,
+			w: windowWidth * 0.02 * 2.56,
+			h: windowWidth * 0.02 * 1.88,
+			jDist: 1400,
+			dropTime: time - 1000 / scrollSpeed.value()
+		};
+	} else {
+		note = {
+			type: 'slider',
+			image: sliderTop,
+			x: lanePos[column],
+			y: -1400,
+			w: windowWidth * 0.02 * 2.56,
+			h: windowWidth * 0.02 * 1.88,
+			length: duration,
+			active: false,
+			mid: {
+				image: sliderMid,
+				y: -1400 - duration
+			},
+			tail: {
+				image: sliderTail,
+				y: -1400 - duration
+			},
+			dropTime: time - 1000 / scrollSpeed.value()
+		};
+	}
+	console.log(note);
+	mapNotes.push(note);
+}
+
 function newSlider(_length = random(0, 10) * 100) {
 	let column = Math.floor(random(0, 4));
 	// let _length = random(0, 10) * 100;
-	slider = {
+	note = {
 		type: 'slider',
 		image: sliderTop,
 		x: lanePos[column],
@@ -441,6 +491,7 @@ function newSlider(_length = random(0, 10) * 100) {
 function parseFile(songname = 'chakra', difficulty) {
 	//song = loadStrings("songs/oshamaScramble/t+pazolite - Oshama Scramble! ([ A v a l o n ]) [Ria's NORMAL].osu");
 	song = textTemp;
+	let newNotes = [];
 	let startLine;
 	for (let i = 0; i < song.length; i++) {
 		if (song[i] === '[HitObjects]') {
@@ -450,6 +501,25 @@ function parseFile(songname = 'chakra', difficulty) {
 	}
 	for (let i = startLine; i < song.length; i++) {
 		HitObjects.push(song[i]);
-		console.log(song[i]);
+		let values = song[i].split(',');
+		switch (values[0]) {
+			case '64':
+				if (values[3] === '128') newNote(0, values[2], true, values[5]);
+				else newNote(0, values[2]);
+				break;
+			case '192':
+				if (values[3] === '128') newNote(0, values[2], true, values[5]);
+				else newNote(0, values[2]);
+				break;
+			case '320':
+				if (values[3] === '128') newNote(0, values[2], true, values[5]);
+				else newNote(0, values[2]);
+				break;
+			case '448':
+				if (values[3] === '128') newNote(0, values[2], true, values[5]);
+				else newNote(0, values[2]);
+				break;
+		}
 	}
+	console.log(mapNotes);
 }
