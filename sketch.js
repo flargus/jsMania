@@ -448,7 +448,7 @@ function parseFile(songname = 'chakra', difficulty) {
 			i = song.length;
 		}
 	}
-	for (let i = startLine; i++; ) {
+	for (let i = startLine; i < song.length; i++) {
 		HitObjects.push(song[i]);
 		console.log(song[i]);
 	}
