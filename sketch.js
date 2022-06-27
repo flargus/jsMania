@@ -7,6 +7,7 @@ let sliderTop;
 let sliderMid;
 let sliderTail;
 let wallTexture;
+let flash;
 
 var rows = 22;
 var img;
@@ -19,6 +20,7 @@ var heightRatio;
 var tunnelOffset = 0;
 var globalTint = 0;
 var addColor = true;
+var textTemp;
 
 function preload() {
 	keyImg = loadImage('assets/key.png');
@@ -30,6 +32,8 @@ function preload() {
 	sliderMid = loadImage('assets/sliderMid.png');
 	sliderTail = loadImage('assets/sliderTail.png');
 	img = loadImage('assets/wallTexture.png');
+	textTemp = loadStrings("songs/oshamaScramble/t+pazolite - Oshama Scramble! ([ A v a l o n ]) [Ria's NORMAL].osu");
+	flash = loadImage('assets/flash.png');
 }
 
 let graphics;
@@ -37,7 +41,7 @@ function setup() {
 	createCanvas(windowWidth, windowHeight, WEBGL);
 	nDesnsity = createSlider(200, 1000);
 	nDesnsity.position(0, 0);
-	scrollSpeed = createSlider(1, 12);
+	scrollSpeed = createSlider(1500, 3000);
 	scrollSpeed.position(0, 30);
 	frameRate(240);
 	let font = loadFont('/assets/futuraBook.otf');
@@ -47,6 +51,7 @@ function setup() {
 	graphics.rect(128 / 4, 0, 128, 10);
 	textureWrap(REPEAT);
 	image(img, 0, 0);
+	parseFile('chakra');
 }
 
 let lates = [];
@@ -66,6 +71,13 @@ let misses = 0;
 let ttHeight;
 let rotateFrame = false;
 let sliderId = 0;
+let lastSpawn = 0;
+let delta = 0;
+let distance = 1000;
+let HitObjects = [];
+
+let songName = 'oshamaScramble';
+let song = [];
 
 function draw() {
 	//resize canvas on every update, in case of window size change
@@ -80,7 +92,7 @@ function draw() {
 	background(0);
 
 	lights();
-
+	delta = (millis() - timer) / 1000;
 	fill(126, 126, 126);
 	imageMode(CENTER);
 	rectMode(CENTER);
@@ -178,36 +190,7 @@ function draw() {
 	translate(0, 0, -5);
 	//this will spawn a note every *note density value*
 	translate(0, 0, 20);
-	if (millis() >= scrollSpeed.value() + timer) {
-		//timer = millis();
-		for (let column of notemap)
-			for (let note of column) {
-				note.y += scrollSpeed.value();
-				note.jDist -= scrollSpeed.value();
-				if (note.type === 'slider') {
-					note.tail.y += scrollSpeed.value();
-					note.mid.y += scrollSpeed.value();
-				}
 
-				if (note.jDist < 200 && canHit[notemap.indexOf(column)].length === 0) {
-					canHit[notemap.indexOf(column)].push(note);
-				}
-			}
-	}
-	if (millis() >= nDesnsity.value() + timer) {
-		fps = frameRate();
-		dropCircle();
-		timer = millis();
-		for (let column of notemap) {
-			for (let note of column) {
-				if (note.type === 'slider') {
-					if (note.active) {
-						combo++;
-					}
-				}
-			}
-		}
-	}
 	if (lates.length > 30) {
 		lates.pop();
 	}
@@ -229,8 +212,8 @@ function draw() {
 	fill(0);
 	translate(0, tunnelOffset, -100);
 	rotateY(0.4);
-	//rotateY(millis() / 1000);
-	tunnelOffset = tunnelOffset > stripH ? 0 : tunnelOffset + scrollSpeed.value() * 2;
+	//rotateY(millis() / 6000);
+	tunnelOffset = tunnelOffset > stripH ? 0 : tunnelOffset + scrollSpeed.value() * delta * 2;
 	heightRatio = (img.width * stripH) / img.height;
 	ang = (-2 * PI) / res;
 	imageMode(CORNER);
@@ -240,7 +223,6 @@ function draw() {
 	translate(0, (-(rows - 1) * stripH) / 2);
 	texture(img);
 	beginShape(TRIANGLE_STRIP);
-
 	for (var j = 0; j < rows; j++) {
 		beginShape(TRIANGLE_STRIP);
 		for (var i = 0; i <= res; i++) {
@@ -256,6 +238,8 @@ function draw() {
 	}
 	pop();
 
+	logic();
+
 	translate(100, 100, 0);
 	rotateX(-1.25);
 	fill(255);
@@ -269,8 +253,47 @@ function draw() {
 	translate(0, 0, 400);
 	rotateX(1.25);
 	text(' D    F    J    K', -200, 170);
+	rotateX(-1.25);
+	timer = millis();
+	push();
+	translate(-120, -1850, -6000);
+	rotateY(millis());
+	texture(flash);
+	sphere(700, 6, 4);
+	//image(flash, 0, 0);
 	pop();
 }
+
+function logic() {
+	for (let column of notemap)
+		for (let note of column) {
+			note.y += scrollSpeed.value() * delta;
+			note.jDist -= scrollSpeed.value() * delta;
+			if (note.type === 'slider') {
+				note.tail.y += scrollSpeed.value() * delta;
+				note.mid.y += scrollSpeed.value() * delta;
+			}
+
+			if (note.jDist < 200 && canHit[notemap.indexOf(column)].length === 0) {
+				canHit[notemap.indexOf(column)].push(note);
+			}
+		}
+	if (millis() >= nDesnsity.value() + lastSpawn) {
+		fps = frameRate();
+		dropCircle();
+		lastSpawn = millis();
+		for (let column of notemap) {
+			for (let note of column) {
+				if (note.type === 'slider') {
+					if (note.active) {
+						combo++;
+					}
+				}
+			}
+		}
+	}
+}
+
 function hit(distance) {
 	combo++;
 	hits++;
@@ -280,6 +303,19 @@ function miss() {
 	combo = 0;
 	misses++;
 }
+
+function handleSong() {
+	let index = 0;
+	for (let line of textTemp) {
+	}
+}
+
+function checkForNotes() {}
+
+// function getTime(){
+// 	let time = distance / scrollSpeed.value()
+// 	if(millis() + time  >= note.spawnTime
+// }
 
 function keyPressed() {
 	switch (key) {
@@ -400,4 +436,20 @@ function newSlider(_length = random(0, 10) * 100) {
 		}
 	};
 	notemap[column].push(slider);
+}
+
+function parseFile(songname = 'chakra', difficulty) {
+	//song = loadStrings("songs/oshamaScramble/t+pazolite - Oshama Scramble! ([ A v a l o n ]) [Ria's NORMAL].osu");
+	song = textTemp;
+	let startLine;
+	for (let i = 0; i < song.length; i++) {
+		if (song[i] === '[HitObjects]') {
+			startLine = i;
+			i = song.length;
+		}
+	}
+	for (let i = startLine; i++; ) {
+		HitObjects.push(song[i]);
+		console.log(song[i]);
+	}
 }
