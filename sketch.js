@@ -34,9 +34,9 @@ function preload() {
 	sliderMid = loadImage('assets/sliderMid.png');
 	sliderTail = loadImage('assets/sliderTail.png');
 	img = loadImage('assets/wallTexture.png');
-	textTemp = loadStrings("songs/oshamaScramble/t+pazolite - Oshama Scramble! ([ A v a l o n ]) [Ria's NORMAL].osu");
 	flash = loadImage('assets/flash.png');
-	music = loadSound('songs/oshamaScramble/t+pazolite - Oshama Scramble!.mp3');
+	music = loadSound('songs/chakra/1494300 uma - Chakra/audio.mp3');
+	textTemp = loadStrings('songs/chakra/1494300 uma - Chakra/uma - Chakra (Shima Rin) [MAXIMUM].osu');
 }
 
 let graphics;
@@ -44,7 +44,7 @@ function setup() {
 	createCanvas(windowWidth, windowHeight, WEBGL);
 	nDesnsity = createSlider(200, 1000);
 	nDesnsity.position(0, 0);
-	scrollSpeed = createSlider(1500, 3000);
+	scrollSpeed = createSlider(2000, 3000);
 	scrollSpeed.position(0, 30);
 	frameRate(240);
 	let font = loadFont('/assets/futuraBook.otf');
@@ -86,6 +86,7 @@ let songName = 'oshamaScramble';
 let song = [];
 let drops = [];
 
+let playing = false;
 var mapNotes = [];
 
 function draw() {
@@ -177,7 +178,11 @@ function draw() {
 	translate(0, 0, -5);
 	//this will spawn a note every *note density value*
 	translate(0, 0, 20);
-	if (millis() >= mapNotes[0].dropTime) {
+	if (millis() + soundOffset >= mapNotes[0].dropTime) {
+		if (!playing) {
+			music.play();
+			playing = true;
+		}
 		notemap[mapNotes[0].col].push(mapNotes[0]);
 		//dropCircle();
 		//console.log(notemap);
@@ -455,6 +460,7 @@ function parseFile(songname = 'chakra', difficulty) {
 			i = song.length;
 		}
 	}
+
 	for (let i = startLine; i < song.length; i++) {
 		HitObjects.push(song[i]);
 		let values = song[i].split(',');
@@ -477,7 +483,5 @@ function parseFile(songname = 'chakra', difficulty) {
 				break;
 		}
 	}
-	soundOffset = 0;
-	music.play();
 	console.log(mapNotes);
 }
