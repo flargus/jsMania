@@ -79,6 +79,7 @@ let noteIndex = 0;
 
 let songName = 'oshamaScramble';
 let song = [];
+let drops = [];
 
 var mapNotes = [];
 
@@ -133,60 +134,36 @@ function draw() {
 	pop();
 	push();
 	translate(0, 0, 5);
-	// for (let i = 0; i < 4; i++) {
-	// 	if (keys[i]) {
-	// 		rotateFrame = true;
-	// 		switch (i) {
-	// 			case 0:
-	// 				rotateY(-0.02);
-	// 				break;
-	// 			case 1:
-	// 				rotateY(-0.01);
-	// 				break;
-	// 			case 2:
-	// 				rotateY(0.01);
-	// 				break;
-	// 			case 3:
-	// 				rotateY(0.02);
-	// 				break;
-	// 		}
-	// 	}
-	// }
-	// translate(0, 0, 15);
-	// for (let judge of jCircle) image(judge);
-	// translate(0, 0, -15);
 	//the notes that have been spawned are controlled here
 	fill(255, 255, 255);
 	translate(0, 0, 5);
 	rotateX(-0.025);
 	for (let column of notemap) {
 		//draw all notes
-		if (column.length > 0) {
-			for (let note of column) {
-				fill(0, 255, 255);
-				switch (note.type) {
-					case 'note':
-						image(note.image, note.x, note.y, note.w, note.h);
-						break;
-					case 'slider':
-						image(note.image, note.x, note.y, note.w, note.h);
-						image(note.mid.image, note.x, note.mid.y, note.w, note.length);
-						image(note.tail.image, note.x, note.tail.y, note.w, note.h);
-				}
+		for (let note of column) {
+			fill(0, 255, 255);
+			switch (note.type) {
+				case 'note':
+					image(note.image, note.x, note.y, note.w, note.h);
+					break;
+				case 'slider':
+					image(note.image, note.x, note.y, note.w, note.h);
+					image(note.mid.image, note.x, note.mid.y, note.w, note.length);
+					image(note.tail.image, note.x, note.tail.y, note.w, note.h);
+					break;
 			}
-			//and here removes them if they are past the judgement line
-			for (let i = 0; i < column.length; i++) {
-				if (column[i].y >= 600 && column[i].type === 'note') {
+		}
+		//and here removes them if they are past the judgement line
+		for (let i = 0; i < column.length; i++) {
+			if (column[i].y >= 600 && column[i].type === 'note') {
+				lates.push(column[i]);
+				column.splice(i, 1);
+				miss();
+			} else if (column[i].type === 'slider') {
+				if (column[i].tail.y > 600) {
 					lates.push(column[i]);
-					// canHit.splice(i, 1);
 					column.splice(i, 1);
 					miss();
-				} else if (column[i].type === 'slider') {
-					if (column[i].tail.y > 600) {
-						lates.push(column[i]);
-						column.splice(i, 1);
-						miss();
-					}
 				}
 			}
 		}
@@ -195,12 +172,11 @@ function draw() {
 	translate(0, 0, -5);
 	//this will spawn a note every *note density value*
 	translate(0, 0, 20);
-	console.log(mapNotes[noteIndex]);
-	if (millis() >= mapNotes[noteIndex].dropTime) {
-		console.log('here');
-		notemap.push(mapNotes[noteIndex]);
-		mapNotes.splice(noteIndex);
-		noteIndex++;
+	if (millis() >= mapNotes[0].dropTime) {
+		notemap[mapNotes[0].col].push(mapNotes[0]);
+		//dropCircle();
+		console.log(notemap);
+		mapNotes.shift();
 	}
 
 	if (lates.length > 30) {
@@ -225,7 +201,7 @@ function draw() {
 	translate(0, tunnelOffset, -100);
 	rotateY(0.4);
 	//rotateY(millis() / 6000);
-	tunnelOffset = tunnelOffset > stripH ? 0 : tunnelOffset + scrollSpeed.value() * delta * 2;
+	tunnelOffset = tunnelOffset > stripH ? 0 : tunnelOffset + scrollSpeed.value() * delta * 5;
 	heightRatio = (img.width * stripH) / img.height;
 	ang = (-2 * PI) / res;
 	imageMode(CORNER);
@@ -270,41 +246,38 @@ function draw() {
 	translate(-120, -1850, -6000);
 	rotateY(millis());
 	texture(flash);
-	sphere(700, 6, 4);
+	sphere(600, 12, 12);
 	//image(flash, 0, 0);
 	pop();
 }
 
 function logic() {
 	for (let column of notemap)
-		if (column.length > 0) {
-			for (let note of column) {
-				note.y += scrollSpeed.value() * delta;
-				note.jDist -= scrollSpeed.value() * delta;
-				if (note.type === 'slider') {
-					note.tail.y += scrollSpeed.value() * delta;
-					note.mid.y += scrollSpeed.value() * delta;
-				}
-
-				if (note.jDist < 200 && canHit[notemap.indexOf(column)].length === 0) {
-					canHit[notemap.indexOf(column)].push(note);
-				}
+		for (let note of column) {
+			note.y += scrollSpeed.value() * delta;
+			note.jDist -= scrollSpeed.value() * delta;
+			if (note.type === 'slider') {
+				note.tail.y += scrollSpeed.value() * delta;
+				note.mid.y += scrollSpeed.value() * delta;
 			}
-			if (millis() >= nDesnsity.value() + lastSpawn) {
-				fps = frameRate();
-				//dropCircle();
-				lastSpawn = millis();
-				for (let column of notemap) {
-					for (let note of column) {
-						if (note.type === 'slider') {
-							if (note.active) {
-								combo++;
-							}
-						}
+
+			if (note.jDist < 200 && canHit[notemap.indexOf(column)].length === 0) {
+				canHit[notemap.indexOf(column)].push(note);
+			}
+		}
+	if (millis() >= nDesnsity.value() + lastSpawn) {
+		fps = frameRate();
+		lastSpawn = millis();
+		for (let column of notemap) {
+			for (let note of column) {
+				if (note.type === 'slider') {
+					if (note.active) {
+						combo++;
 					}
 				}
 			}
 		}
+	}
 }
 
 function hit(distance) {
@@ -385,7 +358,6 @@ function handleKeyPress(key) {
 				hit(dist);
 				column.splice(i, 1);
 			} else if (column[i].type === 'slider') {
-				console.log('here');
 				column[i].active = true;
 				hitSound.play();
 				hit(dist);
@@ -411,36 +383,11 @@ function handleKeyRelease(key) {
 	}
 }
 
-function dropCircle() {
-	let column = Math.floor(random(0, 4));
-	//define the position of the note, this is added to the notemap and subsequently used in draw()
-	note = {
-		type: 'note',
-		image: column === 1 || column === 2 ? note2 : note1,
-		x: lanePos[column],
-		y: -1400,
-		w: windowWidth * 0.02 * 2.56,
-		h: windowWidth * 0.02 * 1.88,
-		jDist: 1400,
-		color: (0, 225, 255)
-	};
-	notemap[column].push(note);
-}
-
 function newNote(column, time, isSlider = false, duration = 50) {
-	if (!isSlider) {
+	let note;
+	if (isSlider) {
 		note = {
-			type: 'note',
-			image: column === 1 || column === 2 ? note2 : note1,
-			x: lanePos[column],
-			y: -1400,
-			w: windowWidth * 0.02 * 2.56,
-			h: windowWidth * 0.02 * 1.88,
-			jDist: 1400,
-			dropTime: time - 1000 / scrollSpeed.value()
-		};
-	} else {
-		note = {
+			col: column,
 			type: 'slider',
 			image: sliderTop,
 			x: lanePos[column],
@@ -459,39 +406,40 @@ function newNote(column, time, isSlider = false, duration = 50) {
 			},
 			dropTime: time - 1000 / scrollSpeed.value()
 		};
+	} else {
+		note = {
+			col: column,
+			type: 'note',
+			image: column === 1 || column === 2 ? note2 : note1,
+			x: lanePos[column],
+			y: -1400,
+			w: windowWidth * 0.02 * 2.56,
+			h: windowWidth * 0.02 * 1.88,
+			jDist: 1400,
+			dropTime: time - 1000 / scrollSpeed.value()
+		};
 	}
-	console.log(note);
 	mapNotes.push(note);
 }
 
-function newSlider(_length = random(0, 10) * 100) {
+function dropCircle() {
 	let column = Math.floor(random(0, 4));
-	// let _length = random(0, 10) * 100;
+	//define the position of the note, this is added to the notemap and subsequently used in draw()
 	note = {
-		type: 'slider',
-		image: sliderTop,
+		type: 'note',
+		image: column === 1 || column === 2 ? note2 : note1,
 		x: lanePos[column],
 		y: -1400,
 		w: windowWidth * 0.02 * 2.56,
 		h: windowWidth * 0.02 * 1.88,
-		length: _length,
-		active: false,
-		mid: {
-			image: sliderMid,
-			y: -1400 - _length / 2
-		},
-		tail: {
-			image: sliderTail,
-			y: -1400 - _length
-		}
+		color: (0, 225, 255)
 	};
-	notemap[column].push(slider);
+	notemap[column].push(note);
 }
 
 function parseFile(songname = 'chakra', difficulty) {
 	//song = loadStrings("songs/oshamaScramble/t+pazolite - Oshama Scramble! ([ A v a l o n ]) [Ria's NORMAL].osu");
 	song = textTemp;
-	let newNotes = [];
 	let startLine;
 	for (let i = 0; i < song.length; i++) {
 		if (song[i] === '[HitObjects]') {
@@ -508,18 +456,17 @@ function parseFile(songname = 'chakra', difficulty) {
 				else newNote(0, values[2]);
 				break;
 			case '192':
-				if (values[3] === '128') newNote(0, values[2], true, values[5]);
-				else newNote(0, values[2]);
+				if (values[3] === '128') newNote(1, values[2], true, values[5]);
+				else newNote(1, values[2]);
 				break;
 			case '320':
-				if (values[3] === '128') newNote(0, values[2], true, values[5]);
-				else newNote(0, values[2]);
+				if (values[3] === '128') newNote(2, values[2], true, values[5]);
+				else newNote(2, values[2]);
 				break;
 			case '448':
-				if (values[3] === '128') newNote(0, values[2], true, values[5]);
-				else newNote(0, values[2]);
+				if (values[3] === '128') newNote(3, values[2], true, values[5]);
+				else newNote(3, values[2]);
 				break;
 		}
 	}
-	console.log(mapNotes);
 }
