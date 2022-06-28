@@ -22,6 +22,8 @@ var globalTint = 0;
 var addColor = true;
 var textTemp;
 
+let music;
+
 function preload() {
 	keyImg = loadImage('assets/key.png');
 	keyPress = loadImage('assets/keyPressed.png');
@@ -34,6 +36,7 @@ function preload() {
 	img = loadImage('assets/wallTexture.png');
 	textTemp = loadStrings("songs/oshamaScramble/t+pazolite - Oshama Scramble! ([ A v a l o n ]) [Ria's NORMAL].osu");
 	flash = loadImage('assets/flash.png');
+	music = loadSound('songs/oshamaScramble/t+pazolite - Oshama Scramble!.mp3');
 }
 
 let graphics;
@@ -53,6 +56,8 @@ function setup() {
 	image(img, 0, 0);
 	parseFile('chakra');
 }
+
+let soundOffset = 0;
 
 let lates = [];
 let lanes = [];
@@ -144,12 +149,12 @@ function draw() {
 			fill(0, 255, 255);
 			switch (note.type) {
 				case 'note':
-					image(note.image, note.x, note.y, note.w, note.h);
+					image(note.image, lanePos[note.col], note.y, note.w, note.h);
 					break;
 				case 'slider':
-					image(note.image, note.x, note.y, note.w, note.h);
-					image(note.mid.image, note.x, note.mid.y, note.w, note.length);
-					image(note.tail.image, note.x, note.tail.y, note.w, note.h);
+					image(note.image, lanePos[note.col], note.y, note.w, note.h);
+					image(note.mid.image, lanePos[note.col], note.mid.y, note.w, note.length);
+					image(note.tail.image, lanePos[note.col], note.tail.y, note.w, note.h);
 					break;
 			}
 		}
@@ -175,7 +180,7 @@ function draw() {
 	if (millis() >= mapNotes[0].dropTime) {
 		notemap[mapNotes[0].col].push(mapNotes[0]);
 		//dropCircle();
-		console.log(notemap);
+		//console.log(notemap);
 		mapNotes.shift();
 	}
 
@@ -419,6 +424,9 @@ function newNote(column, time, isSlider = false, duration = 50) {
 			dropTime: time - 1000 / scrollSpeed.value()
 		};
 	}
+	console.log(column);
+	console.log(lanePos);
+	console.log(lanePos[column]);
 	mapNotes.push(note);
 }
 
@@ -469,4 +477,7 @@ function parseFile(songname = 'chakra', difficulty) {
 				break;
 		}
 	}
+	soundOffset = 0;
+	music.play();
+	console.log(mapNotes);
 }
