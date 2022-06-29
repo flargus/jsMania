@@ -8,6 +8,8 @@ let sliderMid;
 let sliderTail;
 let wallTexture;
 let flash;
+let graphics;
+let music;
 
 var rows = 22;
 var img;
@@ -21,8 +23,6 @@ var tunnelOffset = 0;
 var globalTint = 0;
 var addColor = true;
 var textTemp;
-
-let music;
 
 function preload() {
 	keyImg = loadImage('assets/key.png');
@@ -39,7 +39,6 @@ function preload() {
 	textTemp = loadStrings('songs/chakra/1494300 uma - Chakra/uma - Chakra (Shima Rin) [MAXIMUM].osu');
 }
 
-let graphics;
 function setup() {
 	createCanvas(windowWidth, windowHeight, WEBGL);
 	nDesnsity = createSlider(200, 1000);
@@ -59,7 +58,6 @@ function setup() {
 }
 
 let soundOffset = 0;
-
 let lates = [];
 let lanes = [];
 let lanePos = [];
@@ -82,11 +80,9 @@ let delta = 0;
 let distance = 1000;
 let HitObjects = [];
 let noteIndex = 0;
-
 let songName = 'oshamaScramble';
 let song = [];
 let drops = [];
-
 let playing = false;
 var mapNotes = [];
 let fps;
