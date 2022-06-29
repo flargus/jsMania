@@ -1,0 +1,3 @@
+function milliLoop() {
+	seconds++;
+}
