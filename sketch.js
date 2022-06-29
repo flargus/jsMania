@@ -55,6 +55,7 @@ function setup() {
 	textureWrap(REPEAT);
 	image(img, 0, 0);
 	parseFile('chakra');
+	setInterval(milliLoop, 1);
 }
 
 let soundOffset = 0;
@@ -88,17 +89,23 @@ let drops = [];
 
 let playing = false;
 var mapNotes = [];
+let fps;
+let seconds = 0;
+let tSize;
+let tHeight;
 
 function draw() {
+	game();
+}
+
+function gameSetup() {
 	//resize canvas on every update, in case of window size change
 	resizeCanvas(windowWidth, windowHeight);
-	let fps = frameRate();
-	let foo = [];
-	let bar = [];
-	let vs = [];
-	let tHeight = windowHeight;
+	fps = frameRate();
+
+	tHeight = windowHeight;
 	ttHeight = tHeight;
-	const tSize = windowWidth * 0.2;
+	tSize = windowWidth * 0.2;
 	background(0);
 
 	lights();
@@ -106,7 +113,6 @@ function draw() {
 	fill(126, 126, 126);
 	imageMode(CENTER);
 	rectMode(CENTER);
-
 	fill(0, 0, 0);
 	x = -tSize / 4 - tSize / 8;
 
@@ -116,151 +122,21 @@ function draw() {
 
 	fill(0);
 	lights();
-	// rotateZ(millis() / 500);
-	// rotateY(millis() / 500);
-	//here, if the corresponding key is pressed, the image of a pressed key is shown
-	//this is referred to as the judgement line
-	push();
-	for (let i = 0; i < 4; i++) {
-		translate(0, 0, -25);
-		foo.push(rect(x, 0, tSize / 4 + 45, tHeight + 3500));
-		translate(0, 0, 25);
-		translate(0, 0, -5);
-		bar.push(x);
-		for (let j = 0; j < 4; j++) {
-			if (keys[j] && i == j) {
-				image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
-			}
-		}
-
-		x += tSize / 4;
-		fill(0, 0, 0);
-		translate(0, 0, 5);
-	}
-	pop();
-	push();
-	translate(0, 0, 5);
-	//the notes that have been spawned are controlled here
-	fill(255, 255, 255);
-	translate(0, 0, 5);
-	rotateX(-0.025);
-	for (let column of notemap) {
-		//draw all notes
-		for (let note of column) {
-			fill(0, 255, 255);
-			switch (note.type) {
-				case 'note':
-					image(note.image, lanePos[note.col], note.y, note.w, note.h);
-					break;
-				case 'slider':
-					image(note.image, lanePos[note.col], note.y, note.w, note.h);
-					image(note.mid.image, lanePos[note.col], note.mid.y, note.w, note.length);
-					image(note.tail.image, lanePos[note.col], note.tail.y, note.w, note.h);
-					break;
-			}
-		}
-		//and here removes them if they are past the judgement line
-		for (let i = 0; i < column.length; i++) {
-			if (column[i].y >= 600 && column[i].type === 'note') {
-				lates.push(column[i]);
-				column.splice(i, 1);
-				miss();
-			} else if (column[i].type === 'slider') {
-				if (column[i].tail.y > 600) {
-					lates.push(column[i]);
-					column.splice(i, 1);
-					miss();
-				}
-			}
-		}
-	}
-	rotateX(0.025);
-	translate(0, 0, -5);
-	//this will spawn a note every *note density value*
-	translate(0, 0, 20);
-	if (millis() + soundOffset >= mapNotes[0].dropTime) {
-		if (!playing) {
-			music.play();
-			playing = true;
-		}
-		notemap[mapNotes[0].col].push(mapNotes[0]);
-		//dropCircle();
-		//console.log(notemap);
-		mapNotes.shift();
-	}
-
-	if (lates.length > 30) {
-		lates.pop();
-	}
-	translate(0, 0 - 20);
-	lanes = foo;
-	lanePos = bar;
-	jCircle = vs;
-	x = -tSize / 4 - tSize / 8;
-	translate(0, 0, -20);
-	//this will draw the keys at the bottom
-	for (i = 0; i < 4; i++) {
-		image(keyImg, x, 450, width * 0.05, width * 0.05 * 3);
-		x += tSize / 4;
-	}
-	translate(0, 0, 20);
-	imageMode(CORNER);
-	pop();
-	push();
-	fill(0);
-	translate(0, tunnelOffset, -100);
-	rotateY(0.4);
-	//rotateY(millis() / 6000);
-	tunnelOffset = tunnelOffset > stripH ? 0 : tunnelOffset + scrollSpeed.value() * delta * 5;
-	heightRatio = (img.width * stripH) / img.height;
-	ang = (-2 * PI) / res;
-	imageMode(CORNER);
-	heightRatio = (img.width * stripH) / img.height;
-	ang = (-2 * PI) / res;
-	sectionLength = 1500;
-	translate(0, (-(rows - 1) * stripH) / 2);
-	texture(img);
-	beginShape(TRIANGLE_STRIP);
-	for (var j = 0; j < rows; j++) {
-		beginShape(TRIANGLE_STRIP);
-		for (var i = 0; i <= res; i++) {
-			var x = cos(i * ang) * radius;
-			var z = sin(i * ang) * radius;
-			var y = j * stripH;
-			var yBottom = (j + 1) * stripH;
-			var u = map(i * sectionLength + j, 0, heightRatio, 0, 1);
-			vertex(x, y, z, u, 0);
-			vertex(x, yBottom, z, u, 1);
-		}
-		endShape();
-	}
-	pop();
-	logic();
-
-	translate(100, 100, 0);
-	rotateX(-1.25);
-	fill(255);
-	textSize(30);
-	text('FPS: ' + fps.toFixed(0), -950, -325);
-	text('secs: ' + (millis() / 1000).toFixed(0), -950, -200);
-	text('hits:' + hits, -950, -175);
-	text(combo, -110, -300);
-	text('miss:' + misses, -950, -125);
-
-	translate(0, 0, 400);
-	rotateX(1.25);
-	text(' D    F    J    K', -200, 170);
-	rotateX(-1.25);
-	timer = millis();
-	push();
-	translate(-120, -1850, -6000);
-	rotateY(millis());
-	texture(flash);
-	sphere(600, 12, 12);
-	//image(flash, 0, 0);
-	pop();
 }
-
+function game() {
+	gameSetup();
+	//change colour of notes when corresponding key is pressed
+	//draw track columns
+	renderTrack();
+	//the notes that have been spawned are controlled here
+	renderNotes();
+	//this will spawn a note every *note density value*
+	checkForNotes();
+	drawNotes();
+	//imageMode(CORNER);
+	drawTunnel();
+	//rotateY(millis() / 6000);
+}
 function logic() {
 	for (let column of notemap)
 		for (let note of column) {
@@ -289,30 +165,48 @@ function logic() {
 		}
 	}
 }
-
 function hit(distance) {
 	combo++;
 	hits++;
 }
-
 function miss() {
 	combo = 0;
 	misses++;
 }
-
 function handleSong() {
 	let index = 0;
 	for (let line of textTemp) {
 	}
 }
+function checkForNotes() {
+	translate(0, 0, 20);
+	if (millis() + soundOffset >= mapNotes[0].dropTime) {
+		if (!playing) {
+			music.play();
+			playing = true;
+		}
+		notemap[mapNotes[0].col].push(mapNotes[0]);
+		//dropCircle();
+		//console.log(notemap);
+		mapNotes.shift();
+	}
 
-function checkForNotes() {}
+	if (lates.length > 30) {
+		lates.pop();
+	}
+}
+function drawNotes() {
+	rotateX(0.025);
+	translate(0, 0, -5);
+	x = -tSize / 4 - tSize / 8;
 
-// function getTime(){
-// 	let time = distance / scrollSpeed.value()
-// 	if(millis() + time  >= note.spawnTime
-// }
-
+	//this will draw the keys at the bottom
+	for (i = 0; i < 4; i++) {
+		image(keyImg, x, 450, width * 0.05, width * 0.05 * 3);
+		x += tSize / 4;
+	}
+	translate(0, 0 - 40);
+}
 function keyPressed() {
 	switch (key) {
 		case 'd':
@@ -332,7 +226,6 @@ function keyPressed() {
 			sliderId++;
 	}
 }
-
 function keyReleased() {
 	switch (key) {
 		case 'd':
@@ -349,7 +242,6 @@ function keyReleased() {
 			break;
 	}
 }
-
 function handleKeyPress(key) {
 	keys[key] = true;
 	let column = notemap[key];
@@ -375,7 +267,6 @@ function handleKeyPress(key) {
 		}
 	}
 }
-
 function handleKeyRelease(key) {
 	keys[key] = false;
 	let column = notemap[key];
@@ -392,7 +283,6 @@ function handleKeyRelease(key) {
 		column[i].active = false;
 	}
 }
-
 function newNote(column, time, isSlider = false, duration = 50) {
 	let note;
 	if (isSlider) {
@@ -434,7 +324,6 @@ function newNote(column, time, isSlider = false, duration = 50) {
 	console.log(lanePos[column]);
 	mapNotes.push(note);
 }
-
 function dropCircle() {
 	let column = Math.floor(random(0, 4));
 	//define the position of the note, this is added to the notemap and subsequently used in draw()
@@ -449,7 +338,6 @@ function dropCircle() {
 	};
 	notemap[column].push(note);
 }
-
 function parseFile(songname = 'chakra', difficulty) {
 	//song = loadStrings("songs/oshamaScramble/t+pazolite - Oshama Scramble! ([ A v a l o n ]) [Ria's NORMAL].osu");
 	song = textTemp;
@@ -484,4 +372,132 @@ function parseFile(songname = 'chakra', difficulty) {
 		}
 	}
 	console.log(mapNotes);
+}
+function renderNotes() {
+	push();
+	translate(0, 0, 5);
+	fill(255, 255, 255);
+	translate(0, 0, 5);
+	rotateX(-0.025);
+	for (let column of notemap) {
+		//draw all notes
+		for (let note of column) {
+			fill(0, 255, 255);
+			switch (note.type) {
+				case 'note':
+					image(note.image, lanePos[note.col], note.y, note.w, note.h);
+					break;
+				case 'slider':
+					image(note.image, lanePos[note.col], note.y, note.w, note.h);
+					image(note.mid.image, lanePos[note.col], note.mid.y, note.w, note.length);
+					image(note.tail.image, lanePos[note.col], note.tail.y, note.w, note.h);
+					break;
+			}
+		}
+
+		//and here removes them if they are past the judgement line
+		for (let i = 0; i < column.length; i++) {
+			if (column[i].y >= 600 && column[i].type === 'note') {
+				lates.push(column[i]);
+				column.splice(i, 1);
+				miss();
+			} else if (column[i].type === 'slider') {
+				if (column[i].tail.y > 600) {
+					lates.push(column[i]);
+					column.splice(i, 1);
+					miss();
+				}
+			}
+		}
+	}
+}
+function renderTrack() {
+	//here, if the corresponding key is pressed, the image of a pressed key is shown
+	//this is referred to as the judgement line
+	push();
+	let foo = [];
+	let bar = [];
+	let vs = [];
+	for (let i = 0; i < 4; i++) {
+		translate(0, 0, -25);
+		foo.push(rect(x, 0, tSize / 4 + 45, tHeight + 3500));
+		translate(0, 0, 25);
+		translate(0, 0, -5);
+		bar.push(x);
+		for (let j = 0; j < 4; j++) {
+			if (keys[j] && i == j) {
+				image(keyPress, x, 375, width * 0.045, width * 0.045 * 1.92);
+			}
+		}
+
+		x += tSize / 4;
+		fill(0, 0, 0);
+		translate(0, 0, 5);
+	}
+	pop();
+	lanes = foo;
+	lanePos = bar;
+	jCircle = vs;
+}
+function drawTunnel() {
+	pop();
+	push();
+	fill(0);
+	translate(0, 0, 20);
+	translate(0, tunnelOffset, -100);
+	rotateY(0.4);
+	tunnelOffset = tunnelOffset > stripH ? 0 : tunnelOffset + scrollSpeed.value() * delta * 5;
+	heightRatio = (img.width * stripH) / img.height;
+	ang = (-2 * PI) / res;
+	imageMode(CORNER);
+	heightRatio = (img.width * stripH) / img.height;
+	ang = (-2 * PI) / res;
+	sectionLength = 1500;
+	translate(0, (-(rows - 1) * stripH) / 2);
+	texture(img);
+	beginShape(TRIANGLE_STRIP);
+	for (var j = 0; j < rows; j++) {
+		beginShape(TRIANGLE_STRIP);
+		for (var i = 0; i <= res; i++) {
+			var x = cos(i * ang) * radius;
+			var z = sin(i * ang) * radius;
+			var y = j * stripH;
+			var yBottom = (j + 1) * stripH;
+			var u = map(i * sectionLength + j, 0, heightRatio, 0, 1);
+			vertex(x, y, z, u, 0);
+			vertex(x, yBottom, z, u, 1);
+		}
+		endShape();
+	}
+	pop();
+	logic();
+	hud();
+	pop();
+}
+function hud() {
+	translate(100, 100, 0);
+	rotateX(-1.25);
+	fill(255);
+	textSize(30);
+	text('FPS: ' + fps, -950, -325);
+	text('millis ' + seconds, -950, -275);
+	text('secs: ' + (millis() / 1000).toFixed(0), -950, -200);
+	text('hits:' + hits, -950, -175);
+	text(combo, -110, -300);
+	text('miss:' + misses, -950, -125);
+
+	translate(0, 0, 400);
+	rotateX(1.25);
+	text(' D    F    J    K', -200, 170);
+	rotateX(-1.25);
+	timer = millis();
+	push();
+	translate(-120, -1850, -6000);
+	rotateY(millis());
+	texture(flash);
+	sphere(600, 12, 12);
+	//image(flash, 0, 0);
+}
+function milliLoop() {
+	seconds++;
 }
